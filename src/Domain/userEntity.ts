@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
-export interface Iuser  {
+export interface User  {
+    _id: Types.ObjectId;
     isAdmin: boolean;
     Fname: string;
     Lname: string;
@@ -17,4 +18,7 @@ export interface Iuser  {
     purchasedItems: Types.ObjectId[];
     bookings: Types.ObjectId[];
     marked: Types.ObjectId[];
+    is_verified:boolean;
+    is_google:boolean;
+    is_blocked:boolean
 }
