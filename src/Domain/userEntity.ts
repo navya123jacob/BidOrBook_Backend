@@ -8,11 +8,9 @@ export interface User  {
     addresses: Types.ObjectId[];
     phone: number;
     password: string;
-    client: boolean;
-    artist: boolean;
     posts: Types.ObjectId[];
     auction: Types.ObjectId[];
-    category: 'photographers' | 'artists';
+    category: 'Photographer' | 'Artist';
     receivedReviews: Types.ObjectId[];
     givenReviews: Types.ObjectId[];
     purchasedItems: Types.ObjectId[];
@@ -20,5 +18,6 @@ export interface User  {
     marked: Types.ObjectId[];
     is_verified:boolean;
     is_google:boolean;
-    is_blocked:boolean
+    is_blocked:boolean;
+    profile:string
 }

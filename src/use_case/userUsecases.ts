@@ -152,6 +152,10 @@ class UserUseCase {
     }
   }
 
+  async updateUser(id: string, updateData: Partial<User>): Promise<User | null> {
+    return this.UserRepository.updateUser(id, updateData);
+  }
+
  
 }
 

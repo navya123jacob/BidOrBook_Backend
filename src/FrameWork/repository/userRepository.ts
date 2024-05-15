@@ -46,6 +46,10 @@ class UserRepository implements IUserRepo {
     return user;
   }
 
+  async updateUser(id: string, userData: Partial<User>) {
+    return await UserModel.findByIdAndUpdate(id, userData, { new: true });
+  }
+
 }
 
 export default UserRepository;

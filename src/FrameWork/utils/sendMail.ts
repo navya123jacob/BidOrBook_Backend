@@ -8,7 +8,7 @@ class sendMail {
       service: 'gmail',
       auth: {
         user: 'navyatjacob@gmail.com',
-        pass: 'ikhr splm kruz dhwo',
+        pass: process.env.MAIL_PASSWORD,
       },
     });
   }

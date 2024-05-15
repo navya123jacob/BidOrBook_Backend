@@ -4,6 +4,8 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import sendMail from "../FrameWork/utils/sendMail";
 import GenerateOTP from "../FrameWork/utils/generateOtp";
 import { User } from "../Domain/userEntity";
+import { cloudinary } from "../FrameWork/utils/CloudinaryConfig";
+import asyncHandler from 'express-async-handler';
 class UserController {
   private userCase: Userusecase;
   private sendMailer: sendMail;
@@ -42,9 +44,11 @@ class UserController {
 
   async resendOtp(req: Request, res: Response) {
     try {
+      
       const message ="OTP resent successfully"
       const email = req.app.locals.userData.email
       const otpR = await this.genOtp.generateOtp(4)
+      console.log(otpR)
       req.app.locals.otp = otpR;
       this.sendMailer.sendVerificationEmail(email, otpR);
       res.status(200).json(message);
@@ -165,6 +169,7 @@ class UserController {
   
   async verifyotp(req: Request, res: Response) {
     try {
+      console.log('inside')
         let otpF=req.body.otp
       let otpR = req.app.locals.otp
       if (otpR=== otpF) {
@@ -218,6 +223,45 @@ class UserController {
       res.status(200).json("Logged Out Successfully");
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  async updateUser  (req: Request, res: Response): Promise<void> {
+    try {
+      
+      const { _id } = req.body;
+      const updateData: any = {
+        Fname: req.body.Fname,
+        Lname: req.body.Lname,
+        phone: req.body.phone,
+      };
+     console.log(req.file)
+      if (req.body.password) {
+        updateData.password = req.body.password;
+      }
+
+      if (req.file) {
+        try {
+          const result = await cloudinary.uploader.upload(req.file.path);
+          updateData.profile = result.secure_url;
+        } catch (error) {
+          console.error('Cloudinary upload error:', error);
+          res.status(400).json({ error: 'Failed to upload image to Cloudinary' });
+          return;
+        }
+      }
+
+      const updatedUser = await this.userCase.updateUser(_id, updateData);
+      console.log(updatedUser)
+      if (!updatedUser) {
+        res.status(404).json({ success: false, message: 'User not found' });
+        return;
+      }
+
+      res.status(200).json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
   }
 
