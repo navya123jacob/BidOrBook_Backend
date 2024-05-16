@@ -236,6 +236,7 @@ class UserController {
         phone: req.body.phone,
       };
      console.log(req.file)
+     console.log('above is file')
       if (req.body.password) {
         updateData.password = req.body.password;
       }

@@ -4,7 +4,6 @@ import path from 'path';
 
 const storage = multer.diskStorage({
   filename: function (req, file, cb) {
-      console.log(file, req, 'in');
       cb(null, file.originalname);
   }
 });
@@ -16,7 +15,7 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallb
   cb(null, true);
 };
 
-const fileSizeLimit = 5 * 1024 * 1024; // 5MB
+const fileSizeLimit =  20 * 1024 * 1024; // 10MB
 
 const upload = multer({
   storage: storage,

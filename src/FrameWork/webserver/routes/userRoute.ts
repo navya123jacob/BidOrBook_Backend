@@ -31,10 +31,7 @@ router.post("/login", (req, res) => controller.login(req, res));
 router.post("/resendOtp", (req, res) => controller.resendOtp(req, res));
 router.post("/verifyotp", (req, res) => controller.verifyotp(req, res));
 router.post("/logout", (req, res) => controller.logout(req, res));
-router.put('/clientprofile', (req, res, next) => {
-    console.log(req.body); // Log the request body
-    next(); // Call next middleware in the chain
-}, upload.single('image'),(req, res) => controller.updateUser(req, res));
+router.put('/clientprofile', upload.single('image'),(req, res) => controller.updateUser(req, res));
 
 
 

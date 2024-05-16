@@ -18,7 +18,10 @@ const userSchema: Schema<User> = new mongoose.Schema({
     bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Booking', default: [] }],
     marked: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
     is_verified: { type: Boolean, default: false },
-    profile: { type: String},
+    profile: {
+        type: String,
+        default: 'https://res.cloudinary.com/dvgwqkegd/image/upload/v1715854222/dummy_profile_ozs8gh.jpg'
+    },
     is_blocked: { type: Boolean, default: false }
 });
 
