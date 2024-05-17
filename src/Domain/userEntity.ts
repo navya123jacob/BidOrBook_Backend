@@ -1,11 +1,18 @@
 import { Types } from "mongoose";
-export interface User  {
+
+export interface User {
     _id: Types.ObjectId;
     isAdmin: boolean;
     Fname: string;
     Lname: string;
     email: string;
-    addresses: Types.ObjectId[];
+    addresses: {
+        address: string;
+        pincode: number;
+        state: string;
+        district: string;
+        country: string;
+    }[];
     phone: number;
     password: string;
     posts: Types.ObjectId[];
@@ -16,8 +23,9 @@ export interface User  {
     purchasedItems: Types.ObjectId[];
     bookings: Types.ObjectId[];
     marked: Types.ObjectId[];
-    is_verified:boolean;
-    is_google:boolean;
-    is_blocked:boolean;
-    profile:string
+    is_verified: boolean;
+    is_google: boolean;
+    is_blocked: boolean;
+    profile: string;
+    description: string;
 }

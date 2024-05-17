@@ -1,7 +1,9 @@
 import { User } from "../../Domain/userEntity";
+import { Post } from "../../Domain/postEntity";
 import { UserModel } from "../database/userModel";
 import IUserRepo from "../../use_case/interface/userRepo";
 import Encrypt from "../passwordRepository/hashpassword";
+import { PostModel } from "../database/postModel";
 
 class UserRepository implements IUserRepo {
   private encrypt: Encrypt;
@@ -20,6 +22,8 @@ class UserRepository implements IUserRepo {
     const user = await UserModel.findById({ _id });
     return user;
   }
+ 
+  
 
   async findByEmail(email: string): Promise<User | null> {
     const user = await UserModel.findOne({ email });
@@ -49,6 +53,13 @@ class UserRepository implements IUserRepo {
   async updateUser(id: string, userData: Partial<User>) {
     return await UserModel.findByIdAndUpdate(id, userData, { new: true });
   }
+
+  async findByEmailPop(email: string): Promise<User | null> {
+    const user = await UserModel.findOne({ email }).populate('posts').exec();
+    return user;
+    
+  }
+  
 
 }
 

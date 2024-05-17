@@ -2,6 +2,7 @@ import {User} from "../Domain/userEntity";
 import Encrypt from "../FrameWork/passwordRepository/hashpassword";
 import UserRepository from "../FrameWork/repository/userRepository";
 import jwtToken from "../FrameWork/passwordRepository/jwtpassword";
+import { ObjectId } from 'mongodb'; 
 
 class UserUseCase {
   private Encrypt: Encrypt;
@@ -75,7 +76,8 @@ class UserUseCase {
   }
   async login(user: User) {
     try {
-      const userData = await this.UserRepository.findByEmail(user.email);
+      const userData = await this.UserRepository.findByEmailPop(user.email);
+      console.log(userData)
       let accessToken = '';
       let refreshToken='';
 
@@ -154,6 +156,21 @@ class UserUseCase {
 
   async updateUser(id: string, updateData: Partial<User>): Promise<User | null> {
     return this.UserRepository.updateUser(id, updateData);
+  }
+
+  async addPostToUser(userId: string, postId: ObjectId): Promise<void> {
+    try {
+      const user = await this.UserRepository.findById(userId);
+      if (!user) {
+        console.error('User not found');
+        return;
+      }
+
+      user.posts.push(postId);
+      await this.UserRepository.updateUser(userId, { posts: user.posts });
+    } catch (error) {
+      console.error('Error updating user posts:', error);
+    }
   }
 
  

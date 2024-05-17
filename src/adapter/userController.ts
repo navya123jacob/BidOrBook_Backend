@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
 import Userusecase from "../use_case/userUsecases"; //for giving types
-import jwt, { JwtPayload } from "jsonwebtoken";
 import sendMail from "../FrameWork/utils/sendMail";
 import GenerateOTP from "../FrameWork/utils/generateOtp";
 import { User } from "../Domain/userEntity";
 import { cloudinary } from "../FrameWork/utils/CloudinaryConfig";
-import asyncHandler from 'express-async-handler';
+
 class UserController {
   private userCase: Userusecase;
   private sendMailer: sendMail;
@@ -234,9 +233,9 @@ class UserController {
         Fname: req.body.Fname,
         Lname: req.body.Lname,
         phone: req.body.phone,
+        description:req.body.description
       };
-     console.log(req.file)
-     console.log('above is file')
+     
       if (req.body.password) {
         updateData.password = req.body.password;
       }
@@ -253,7 +252,7 @@ class UserController {
       }
 
       const updatedUser = await this.userCase.updateUser(_id, updateData);
-      console.log(updatedUser)
+      
       if (!updatedUser) {
         res.status(404).json({ success: false, message: 'User not found' });
         return;
@@ -265,6 +264,7 @@ class UserController {
       res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
   }
+  
 
   }
 
