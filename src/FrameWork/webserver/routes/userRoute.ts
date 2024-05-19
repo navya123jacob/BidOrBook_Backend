@@ -33,9 +33,12 @@ router.post("/resendOtp", (req, res) => controller.resendOtp(req, res));
 router.post("/verifyotp", (req, res) => controller.verifyotp(req, res));
 router.post("/logout", (req, res) => controller.logout(req, res));
 router.put('/clientprofile', upload.single('image'),(req, res) => controller.updateUser(req, res));
+router.post('/allpost', (req, res) => controller.getAllPosts(req,res));
 
 //post
 router.post('/createpost', upload.single('image'),(req, res) => pController.createPost(req,res));
 
 
+
 export default router
+

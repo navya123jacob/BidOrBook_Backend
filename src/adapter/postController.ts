@@ -48,4 +48,7 @@ export class PostController {
       res.status(500).json({ error: 'Failed to create post' });
     }
   }
+
+  
+  
 }

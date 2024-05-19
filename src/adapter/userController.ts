@@ -264,6 +264,24 @@ class UserController {
       res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
   }
+
+ 
+  async getAllPosts(req: Request, res: Response): Promise<void> {
+    try {
+      const { userid, category } = req.body;
+      const filters: {  category?: string } = {};
+  
+      if (category) {
+        filters.category = category as string;
+      }
+  
+      const posts = await this.userCase.getAllPosts(filters);
+      res.status(200).json({ success: true, posts });
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+  }
   
 
   }

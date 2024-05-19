@@ -173,6 +173,14 @@ class UserUseCase {
     }
   }
 
+  
+  async getAllPosts(filters: { userid?: string; category?: string }): Promise<User[]> {
+    try {
+      return await this.UserRepository.getAllPosts(filters);
+    } catch (error) {
+      throw new Error('Failed to fetch posts');
+    }
+  }
  
 }
 

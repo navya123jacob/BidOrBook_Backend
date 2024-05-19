@@ -60,6 +60,22 @@ class UserRepository implements IUserRepo {
     
   }
   
+  async getAllPosts(filters: { userid?: string; category?: string }): Promise<User[]> {
+    try {
+        
+      
+        const query: any = {};
+        if(filters.category) {
+          query.category=filters.category
+        }
+        const usersWithPosts = await UserModel.find(query).populate('posts').exec();
+        const filteredUsers = usersWithPosts.filter(user => user.posts.length > 0);
+
+        return filteredUsers;
+    } catch (error) {
+        throw new Error('Failed to fetch posts');
+    }
+}
 
 }
 
