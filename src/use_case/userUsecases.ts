@@ -76,7 +76,7 @@ class UserUseCase {
   }
   async login(user: User) {
     try {
-      const userData = await this.UserRepository.findByEmailPop(user.email);
+      const userData = await this.UserRepository.findByEmail(user.email);
       console.log(userData)
       let accessToken = '';
       let refreshToken='';

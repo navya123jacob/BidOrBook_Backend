@@ -33,7 +33,7 @@ class UserRepository implements IUserRepo {
   async newUser(user: User){
     const hashedPass = await this.encrypt.generateHash(user.password);
     const newUser = { ...user, is_verified: true, password: hashedPass };
-    await this.save(newUser); // Using the save method of the UserRepository class
+    await this.save(newUser); 
     return {
       status: 200,
       data: { status: true, message: 'Registration successful!' }
@@ -54,28 +54,43 @@ class UserRepository implements IUserRepo {
     return await UserModel.findByIdAndUpdate(id, userData, { new: true });
   }
 
-  async findByEmailPop(email: string): Promise<User | null> {
-    const user = await UserModel.findOne({ email }).populate('posts').exec();
-    return user;
-    
-  }
   
-  async getAllPosts(filters: { userid?: string; category?: string }): Promise<User[]> {
+  
+  async getAllPosts(filters: { userid?: string; category?: string }): Promise<any> {
     try {
-        
-      
-        const query: any = {};
-        if(filters.category) {
-          query.category=filters.category
-        }
+      const query: any = {};
+  console.log(filters.userid)
+      if (filters.category) {
+        query.category = filters.category;
+  
+        // Populate the 'posts' field with User objects
         const usersWithPosts = await UserModel.find(query).populate('posts').exec();
         const filteredUsers = usersWithPosts.filter(user => user.posts.length > 0);
-
+  
         return filteredUsers;
+      } else if (filters.userid) {
+        query.userid = filters.userid;
+  
+        const userWithPosts = await PostModel.find(query).exec();
+      
+        if (!userWithPosts) {
+          return [];
+        }
+  
+        return userWithPosts;
+      } else {
+       
+        return [];
+      }
     } catch (error) {
-        throw new Error('Failed to fetch posts');
+      throw new Error('Failed to fetch posts');
     }
-}
+  }
+  
+  
+  
+  
+
 
 }
 
