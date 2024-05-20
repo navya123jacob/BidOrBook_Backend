@@ -19,7 +19,13 @@ class PostRepository {
     }
   }
  
-  
+  async deletePost(postId: string): Promise<void> {
+    try {
+      await PostModel.findByIdAndDelete(postId);
+    } catch (error:any) {
+      throw new Error('Error deleting post: ' + error.message);
+    }
+  }
 
 
 }

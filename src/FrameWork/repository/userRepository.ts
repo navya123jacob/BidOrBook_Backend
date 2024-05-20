@@ -59,7 +59,7 @@ class UserRepository implements IUserRepo {
   async getAllPosts(filters: { userid?: string; category?: string }): Promise<any> {
     try {
       const query: any = {};
-  console.log(filters.userid)
+  
       if (filters.category) {
         query.category = filters.category;
   
@@ -88,7 +88,13 @@ class UserRepository implements IUserRepo {
   }
   
   
-  
+  async removePost(userId: string, postId: string): Promise<void> {
+    try {
+      await UserModel.findByIdAndUpdate(userId, { $pull: { posts: postId } });
+    } catch (error:any) {
+      throw new Error('Error removing post from user: ' + error.message);
+    }
+  }
   
 
 

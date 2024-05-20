@@ -166,7 +166,7 @@ class UserUseCase {
         return;
       }
 
-      user.posts.push(postId);
+      user.posts.unshift(postId);
       await this.UserRepository.updateUser(userId, { posts: user.posts });
     } catch (error) {
       console.error('Error updating user posts:', error);
@@ -179,6 +179,14 @@ class UserUseCase {
       return await this.UserRepository.getAllPosts(filters);
     } catch (error) {
       throw new Error('Failed to fetch posts');
+    }
+  }
+
+  async removePostFromUser(userId: string, postId: string): Promise<void> {
+    try {
+      await this.UserRepository.removePost(userId, postId);
+    } catch (error:any) {
+      throw new Error('Error removing post from user: ' + error.message);
     }
   }
  

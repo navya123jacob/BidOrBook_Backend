@@ -12,7 +12,13 @@ class PostUseCase {
       throw new Error('Failed to create post');
     }
   }
-  
+  async deletePost(postId: string): Promise<void> {
+    try {
+      await postRepository.deletePost(postId);
+    } catch (error:any) {
+      throw new Error('Error deleting post: ' + error.message);
+    }
+  }
 
 }
 

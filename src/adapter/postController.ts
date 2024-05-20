@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import { Post } from '../Domain/postEntity';
 import { postUseCase } from '../use_case/postUseCase';
-import UserUseCase from '../use_case/userUsecases'; // Import UserUseCase class
+import UserUseCase from '../use_case/userUsecases'; 
 import { cloudinary } from '../FrameWork/utils/CloudinaryConfig';
 import Encrypt from "../FrameWork/passwordRepository/hashpassword";
 import UserRepository from "../FrameWork/repository/userRepository";
 import jwtToken from "../FrameWork/passwordRepository/jwtpassword";
 
 export class PostController {
-    private userUseCase: UserUseCase; // Declare userUseCase as a class property
+    private userUseCase: UserUseCase; 
 
     constructor() {
      
@@ -50,5 +50,19 @@ export class PostController {
   }
 
   
+  async deletePost(req: Request, res: Response): Promise<void> {
+    try {
+      
+      const { postId, userId } = req.body;
+
+      await postUseCase.deletePost(postId);
+      await this.userUseCase.removePostFromUser(userId, postId);
+
+      res.status(200).json({ message: 'Post deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      res.status(500).json({ error: 'Failed to delete post' });
+    }
+  }
   
 }

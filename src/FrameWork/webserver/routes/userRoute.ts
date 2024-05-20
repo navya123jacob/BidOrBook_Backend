@@ -37,6 +37,7 @@ router.post('/allpost', (req, res) => controller.getAllPosts(req,res));
 
 //post
 router.post('/createpost', upload.single('image'),(req, res) => pController.createPost(req,res));
+router.delete('/deletepost',(req, res) => pController.deletePost(req,res));
 
 
 
