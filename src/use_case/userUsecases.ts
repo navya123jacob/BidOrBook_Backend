@@ -62,6 +62,30 @@ class UserUseCase {
       };
     }
   }
+
+  async updatePass(email: string, newPassword: string) {
+    const userData = await this.UserRepository.findByEmail(email);
+    if (!userData) {
+        return { status: 404, data: { message: 'User not found.' } };
+    }
+    if (userData.is_google) {
+        return { status: 400, data: { message: 'Password reset is not available for Google signed-up accounts. Please use Google to log in.' } };
+    }
+
+    const isSamePassword = await this.Encrypt.compare(newPassword, userData.password);
+    if (isSamePassword) {
+        return { status: 400, data: { message: 'The new password must be different from the current password' } };
+    }
+
+    const id = userData._id;
+    if (id) {
+        const updatedUserData = await this.UserRepository.findOneAndUpdate(id, { password: await this.Encrypt.generateHash(newPassword) });
+        return { status: 200, data: updatedUserData, message: 'Password changed' };
+    } else {
+        return { status: 400, data: { message: 'User ID is undefined.' } };
+    }
+}
+
   async newUser(user:User){
     console.log(user);
    
@@ -77,7 +101,7 @@ class UserUseCase {
   async login(user: User) {
     try {
       const userData = await this.UserRepository.findByEmail(user.email);
-      console.log(userData)
+      
       let accessToken = '';
       let refreshToken='';
 
@@ -98,6 +122,7 @@ class UserUseCase {
           const userId = userData?._id.toHexString();
           if (userId) {
             accessToken = this.JWTToken.generateAccessToken(userId, 'user');
+            console.log(accessToken)
             refreshToken = this.JWTToken.generateRefreshToken(userId);
             return {
               status: 200,

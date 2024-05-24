@@ -76,6 +76,7 @@ class UserController {
         const email = req.body.email
         req.app.locals.email= email
         const otp = await this.genOtp.generateOtp(4)
+        console.log(otp)
         req.app.locals.otp = otp;
         this.sendMailer.sendVerificationEmail(email, otp);
         res.status(200).json(data);
@@ -92,41 +93,7 @@ class UserController {
     }
   }
 
-  async checkMailOtp(req: Request, res: Response) {
-    try {
-      console.log(req.body.email)
-      const user = await this.userCase.resetPass1(req.body.email);
-      console.log(user)
-      if (user.data.state === true && user?.data?.data) {
-        const data = {
-          state: false,
-          message: 'User already exists with the given email'
-        };
-        res.status(200).json(data);
-      } else if (user.data.state === false) {
-        const email = req.body.email;
-        const otp = await this.genOtp.generateOtp(4);
-        this.sendMailer.sendVerificationEmail(email, otp);
-        const data = {
-          state: true,
-          message: "OTP sent successfully"
-        };
-        req.app.locals.email = email;
-        req.app.locals.otp = otp;
-        res.status(200).json(data);
-      } else {
-        res.status(400).json({
-          state: false,
-          message: "Unexpected state"
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  }
-
-
+ 
   async resetPass2(req: Request, res: Response) {
     try {
       let otpF=req.body.otp
@@ -136,7 +103,8 @@ class UserController {
         const status= 200
         const data={
           state:true,
-          message:'Verification success'
+          message:'Verification success',
+          email:req.body.email
         }
         res.status(status).json(data);
       } else {
@@ -153,9 +121,11 @@ class UserController {
 
   async resendOtp2(req: Request, res: Response) {
     try {
+      
       const message = "OTP resent successfully"
       const email = req.app.locals.email
       const otpR = await this.genOtp.generateOtp(4)
+      console.log(otpR)
       req.app.locals.otp = otpR;
       this.sendMailer.sendVerificationEmail(email, otpR);
       res.status(200).json(message);
@@ -164,11 +134,28 @@ class UserController {
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
+  async setnewpass(req: Request, res: Response) {
+    try {
+      const email = req.app.locals.email
+      const user = await this.userCase.resetPass1(email);
+      if (user) {
+        const updated = await this.userCase.updatePass(email, req.body.password)
+       res.status(updated.status).json(updated)
+      }else{
+        const data= {
+          message:'Failed to updated password'
+        }
+        res.status(400).json(data)
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(401).json(err);
+    }
+  } 
 
   
   async verifyotp(req: Request, res: Response) {
     try {
-      console.log('inside')
         let otpF=req.body.otp
       let otpR = req.app.locals.otp
       if (otpR=== otpF) {
@@ -184,46 +171,65 @@ class UserController {
     }
   }
 
+  
+
   async login(req: Request, res: Response) {
     try {
       const user = await this.userCase.login(req.body);
-      console.log(user)
+      
       if (user) {
         const id = (user?.data?.message as User)?._id.toHexString();
         await this.userCase.saveRefreshToken(id, user.data.refreshToken);
+        
+        const secureFlag = process.env.NODE_ENV === 'production'; 
         res.cookie('userJWT', user.data.accessToken, {
           httpOnly: true,
           sameSite: 'none',
-          secure: process.env.NODE_ENV !== 'development',
+          secure: secureFlag, 
           maxAge: 30 * 24 * 60 * 60 * 1000
         });
   
         res.cookie('refreshToken', user.data.refreshToken, {
           httpOnly: true,
           sameSite: 'none',
-          secure: process.env.NODE_ENV !== 'development',
+          secure: secureFlag,
           maxAge: 30 * 24 * 60 * 60 * 1000 
         });
         const { accessToken, refreshToken, ...userData } = user.data;
+        
         res.status(user?.status).json(userData);
       }
+      
     } catch (err) {
       console.log(err);
       res.status(401).json(err);
     }
-  }
+}
 
   async logout(req: Request, res: Response) {
     try {
-      res.cookie("userId","",{
-        httpOnly: true,
-        expires: new Date(0),
-      });
-      res.status(200).json("Logged Out Successfully");
+        
+        res.cookie('userJWT', '', {
+            httpOnly: true,
+            sameSite: 'none',
+            secure: process.env.NODE_ENV !== 'development',
+            expires: new Date(0) // Set expiration to past
+        });
+        
+        
+        res.cookie('refreshToken', '', {
+            httpOnly: true,
+            sameSite: 'none',
+            secure: process.env.NODE_ENV !== 'development',
+            expires: new Date(0) // Set expiration to past
+        });
+
+        res.status(200).json("Logged Out Successfully");
     } catch (error) {
-      console.log(error)
+        console.log(error);
+        res.status(500).json({ message: "An error occurred while logging out" });
     }
-  }
+}
 
   async updateUser  (req: Request, res: Response): Promise<void> {
     try {

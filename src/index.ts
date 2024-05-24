@@ -4,7 +4,7 @@ import connectDb from "./FrameWork/webserver/config/db";
 // import socket  from './socket/socket'
 import http from 'http'
 
-const port =8888
+const port =process.env.PORT
 const server = http.createServer(app)
 
 const start = ()=>{

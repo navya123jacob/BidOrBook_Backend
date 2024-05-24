@@ -1,18 +1,20 @@
 import { Types } from "mongoose";
 
+export interface Address {
+    address: string;
+    pincode: number;
+    state: string;
+    district: string;
+    country: string;
+}
+
 export interface User {
     _id: Types.ObjectId;
     isAdmin: boolean;
     Fname: string;
     Lname: string;
     email: string;
-    addresses: {
-        address: string;
-        pincode: number;
-        state: string;
-        district: string;
-        country: string;
-    }[];
+    addresses: Address[];
     phone: number;
     password: string;
     posts: Types.ObjectId[];
@@ -28,4 +30,6 @@ export interface User {
     is_blocked: boolean;
     profile: string;
     description: string;
+    refreshToken?: string;  
+    
 }

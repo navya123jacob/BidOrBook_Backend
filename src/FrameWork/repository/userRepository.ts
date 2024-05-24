@@ -4,7 +4,7 @@ import { UserModel } from "../database/userModel";
 import IUserRepo from "../../use_case/interface/userRepo";
 import Encrypt from "../passwordRepository/hashpassword";
 import { PostModel } from "../database/postModel";
-
+import { Types } from "mongoose";
 class UserRepository implements IUserRepo {
   private encrypt: Encrypt;
 
@@ -19,16 +19,25 @@ class UserRepository implements IUserRepo {
   }
 
   async findById(_id: string): Promise<User | null> {
-    const user = await UserModel.findById({ _id });
+    const user = await UserModel.findById(_id);
     return user;
   }
- 
   
-
   async findByEmail(email: string): Promise<User | null> {
     const user = await UserModel.findOne({ email });
     return user;
   }
+
+  
+async findOneAndUpdate(_id: Types.ObjectId | string, update: Partial<User>): Promise<User | null> {
+  const user = await UserModel.findOneAndUpdate(
+      { _id: new Types.ObjectId(_id) },
+      { $set: update },
+      { new: true }
+  );
+  return user;
+}
+
 
   async newUser(user: User){
     const hashedPass = await this.encrypt.generateHash(user.password);
@@ -54,8 +63,6 @@ class UserRepository implements IUserRepo {
     return await UserModel.findByIdAndUpdate(id, userData, { new: true });
   }
 
-  
-  
   async getAllPosts(filters: { userid?: string; category?: string }): Promise<any> {
     try {
       const query: any = {};
@@ -79,15 +86,13 @@ class UserRepository implements IUserRepo {
   
         return userWithPosts;
       } else {
-       
         return [];
       }
     } catch (error) {
       throw new Error('Failed to fetch posts');
     }
   }
-  
-  
+
   async removePost(userId: string, postId: string): Promise<void> {
     try {
       await UserModel.findByIdAndUpdate(userId, { $pull: { posts: postId } });
@@ -95,9 +100,6 @@ class UserRepository implements IUserRepo {
       throw new Error('Error removing post from user: ' + error.message);
     }
   }
-  
-
-
 }
 
 export default UserRepository;

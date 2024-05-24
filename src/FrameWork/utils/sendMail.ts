@@ -14,6 +14,7 @@ class sendMail {
   }
 
   sendVerificationEmail(email: string, verificationToken: string): Promise<void> {
+    
     const mailOptions: nodemailer.SendMailOptions = {
       from: 'navyatjacob@gmail.com',
       to: email,

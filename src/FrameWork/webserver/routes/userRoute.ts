@@ -9,7 +9,7 @@ import GenerateOTP from "../../utils/generateOtp";
 import upload from "../../utils/Multer";
 import asyncHandler from 'express-async-handler';
 import { PostController } from "../../../adapter/postController";
-
+import { protect } from "../../middlewares/userAuth";
 const encrypt = new Encrypt();
 const JWTPassword = new jwtPassword();
 const sendMail = new nodemailerUtils();
@@ -31,13 +31,20 @@ router.post("/signup", (req, res) => controller.signup(req, res));
 router.post("/login", (req, res) => controller.login(req, res));
 router.post("/resendOtp", (req, res) => controller.resendOtp(req, res));
 router.post("/verifyotp", (req, res) => controller.verifyotp(req, res));
-router.post("/logout", (req, res) => controller.logout(req, res));
-router.put('/clientprofile', upload.single('image'),(req, res) => controller.updateUser(req, res));
-router.post('/allpost', (req, res) => controller.getAllPosts(req,res));
+router.post('/forgotpassword',(req, res) => controller.resetPass1(req,res));
+router.post('/verifyotp2',(req, res) => controller.resetPass2(req,res));
+router.post('/setpassword',(req, res) => controller.setnewpass(req,res));
+router.get('/forgotresendOtp',(req, res) => controller.resendOtp2(req,res));
+router.post("/logout",protect, (req, res) => controller.logout(req, res));
+router.put('/clientprofile',protect, upload.single('image'),(req, res) => controller.updateUser(req, res));
+router.post('/allpost',protect, (req, res) => controller.getAllPosts(req,res));
+router.get('/logout',protect,(req, res) => controller.logout(req,res));
+
 
 //post
-router.post('/createpost', upload.single('image'),(req, res) => pController.createPost(req,res));
-router.delete('/deletepost',(req, res) => pController.deletePost(req,res));
+router.post('/createpost',protect, upload.single('image'),(req, res) => pController.createPost(req,res));
+router.delete('/deletepost',protect,(req, res) => pController.deletePost(req,res));
+
 
 
 
