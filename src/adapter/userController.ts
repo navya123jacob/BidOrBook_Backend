@@ -274,12 +274,15 @@ class UserController {
  
   async getAllPosts(req: Request, res: Response): Promise<void> {
     try {
-      const { userid, category } = req.body;
-      const filters: {  category?: string,userid?:string } = {};
+      const { userid, category,usernotid,searchPlaceholder } = req.body;
+      const filters: {  category?: string,userid?:string,usernotid?:string,searchPlaceholder?: string } = {};
   
       if (category) {
         filters.category = category as string;
-        
+        filters.usernotid=usernotid as string;
+        if(searchPlaceholder){
+          filters.searchPlaceholder=searchPlaceholder as string
+        }
       }
       if (userid) {
         filters.userid = userid as string;

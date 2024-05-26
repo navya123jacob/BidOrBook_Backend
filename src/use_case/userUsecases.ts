@@ -199,7 +199,7 @@ class UserUseCase {
   }
 
   
-  async getAllPosts(filters: { userid?: string; category?: string }): Promise<User[]> {
+  async getAllPosts(filters: { userid?: string; category?: string;searchPlaceholder?: string;usernotid?:string}): Promise<User[]> {
     try {
       return await this.UserRepository.getAllPosts(filters);
     } catch (error) {

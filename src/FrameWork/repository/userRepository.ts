@@ -63,14 +63,33 @@ async findOneAndUpdate(_id: Types.ObjectId | string, update: Partial<User>): Pro
     return await UserModel.findByIdAndUpdate(id, userData, { new: true });
   }
 
-  async getAllPosts(filters: { userid?: string; category?: string }): Promise<any> {
+  async getAllPosts(filters: { userid?: string; category?: string; usernotid?: string;searchPlaceholder?: string}): Promise<any> {
     try {
       const query: any = {};
-  
+      
       if (filters.category) {
         query.category = filters.category;
-  
-        // Populate the 'posts' field with User objects
+        query._id = { $ne: filters.usernotid };
+        if (filters.searchPlaceholder) {
+          const words = filters.searchPlaceholder.trim().split(/\s+/); // Split search input into words
+          const firstName = words[0];
+          const lastName = words.slice(1).join(' ').trim(); // Join remaining words as last name
+        
+          const firstNameRegex = new RegExp(firstName, 'i');
+          const lastNameRegex = new RegExp(lastName, 'i');
+        
+          // Construct an array of conditions based on the number of words in the search input
+          const conditions = words.map(word => (
+            {
+              $or: [
+                { $regexMatch: { input: { $trim: { input: '$Fname' } }, regex: new RegExp(word, 'i') } }, // Search in Fname
+                { $regexMatch: { input: { $trim: { input: '$Lname' } }, regex: new RegExp(word, 'i') } }   // Search in Lname
+              ]
+            }
+          ));
+        
+          query.$expr = { $and: conditions };
+        }
         const usersWithPosts = await UserModel.find(query).populate('posts').exec();
         const filteredUsers = usersWithPosts.filter(user => user.posts.length > 0);
   
