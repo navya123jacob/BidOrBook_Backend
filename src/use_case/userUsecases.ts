@@ -206,6 +206,13 @@ class UserUseCase {
       throw new Error('Failed to fetch posts');
     }
   }
+  async singleUserPost(userId: string): Promise<any> {
+    try {
+      return await this.UserRepository.singleUserPost(userId);
+    } catch (error:unknown) {
+      throw new Error('Error fetching user post: ' + (error as Error).message);
+    }
+  }
 
   async removePostFromUser(userId: string, postId: string): Promise<void> {
     try {

@@ -10,6 +10,9 @@ import upload from "../../utils/Multer";
 import asyncHandler from 'express-async-handler';
 import { PostController } from "../../../adapter/postController";
 import { protect } from "../../middlewares/userAuth";
+import { BookingController } from "../../../adapter/bookingController";
+import { BookingUseCase } from "../../../use_case/BookingUseCase";
+import { BookingRepository } from "../../repository/BookingRepository";
 const encrypt = new Encrypt();
 const JWTPassword = new jwtPassword();
 const sendMail = new nodemailerUtils();
@@ -17,12 +20,15 @@ const sendMail = new nodemailerUtils();
 const generateOtp= new GenerateOTP()
 
 const repository = new userRepository(encrypt); // Pass encrypt to the userRepository constructor
-
+const bookingRepository = new BookingRepository();
 
 const useCase=new Userusecase(encrypt,repository,JWTPassword)
 
+const bookingUseCase = new BookingUseCase(bookingRepository);
+
 const controller = new userController(useCase, sendMail, generateOtp)
 const pController=new PostController()
+const bController=new BookingController(bookingUseCase)
 
 const router=express.Router();
 
@@ -38,12 +44,16 @@ router.get('/forgotresendOtp',(req, res) => controller.resendOtp2(req,res));
 router.post("/logout",protect, (req, res) => controller.logout(req, res));
 router.put('/clientprofile',protect, upload.single('image'),(req, res) => controller.updateUser(req, res));
 router.post('/allpost',protect, (req, res) => controller.getAllPosts(req,res));
+router.post('/singleposts/:id',protect, (req, res) => controller.singleUserPost(req,res));
 router.get('/logout',protect,(req, res) => controller.logout(req,res));
 
 
 //post
 router.post('/createpost',protect, upload.single('image'),(req, res) => pController.createPost(req,res));
 router.delete('/deletepost',protect,(req, res) => pController.deletePost(req,res));
+
+//booking
+router.post('/checkavailability',protect,(req, res) => bController.checkAvailability(req,res));
 
 
 

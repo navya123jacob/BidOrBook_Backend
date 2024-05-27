@@ -296,6 +296,17 @@ class UserController {
       res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
   }
+
+  async singleUserPost(req: Request, res: Response): Promise<void> {
+    try {
+      
+      const userId: string = req.params.id; 
+      const user = await this.userCase.singleUserPost(userId); 
+      res.json(user); 
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message }); 
+    }
+  }
   
 
   }

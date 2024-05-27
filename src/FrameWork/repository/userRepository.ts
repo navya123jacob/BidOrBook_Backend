@@ -78,7 +78,6 @@ async findOneAndUpdate(_id: Types.ObjectId | string, update: Partial<User>): Pro
           const firstNameRegex = new RegExp(firstName, 'i');
           const lastNameRegex = new RegExp(lastName, 'i');
         
-          // Construct an array of conditions based on the number of words in the search input
           const conditions = words.map(word => (
             {
               $or: [
@@ -111,6 +110,15 @@ async findOneAndUpdate(_id: Types.ObjectId | string, update: Partial<User>): Pro
       throw new Error('Failed to fetch posts');
     }
   }
+
+  async singleUserPost(userId: string): Promise<any> {
+    try {
+      return await UserModel.findOne({ _id: userId }).populate('posts').exec();
+    } catch (error:any) {
+      throw new Error('Error fetching user post: ' + error.message);
+    }
+  }
+
 
   async removePost(userId: string, postId: string): Promise<void> {
     try {
