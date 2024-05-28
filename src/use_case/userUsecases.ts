@@ -3,6 +3,7 @@ import Encrypt from "../FrameWork/passwordRepository/hashpassword";
 import UserRepository from "../FrameWork/repository/userRepository";
 import jwtToken from "../FrameWork/passwordRepository/jwtpassword";
 import { ObjectId } from 'mongodb'; 
+import { Types } from "mongoose";
 
 class UserUseCase {
   private Encrypt: Encrypt;
@@ -219,6 +220,19 @@ class UserUseCase {
       await this.UserRepository.removePost(userId, postId);
     } catch (error:any) {
       throw new Error('Error removing post from user: ' + error.message);
+    }
+  }
+
+  
+  async addBookingIdToUser(artistId: string, bookingId: Types.ObjectId) {
+    try {
+      await this.UserRepository.addBookingIdToUser(artistId, bookingId);
+      return {
+        status: 200,
+        data: { message: 'Booking ID added to user successfully' }
+      };
+    } catch (error) {
+      throw new Error('Failed to add booking ID to user: ' + (error as Error).message);
     }
   }
  

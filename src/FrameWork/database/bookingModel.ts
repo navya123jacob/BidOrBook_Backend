@@ -10,17 +10,17 @@ const addressSchema = new Schema({
 });
 
 const bookingSchema = new Schema<Booking>({
-  status: { type: String, required: true, enum: ['pending', 'confirmed', 'cancelled'] },
+  status: { type: String, required: true, enum: ['pending', 'confirmed', 'cancelled'],default:'pending' },
   clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   artistId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   location: { 
     type: addressSchema,
-    required: true
+    
   },
-  event: { type: String, required: true },
-  payment_method: { type: String, required: true },
-  payment_date: { type: Date, required: true },
-  date_of_booking: { type: Date, default: Date.now }
+  event: { type: String},
+  payment_method: { type: String },
+  payment_date: { type: Date },
+  date_of_booking: { type: [Date] } 
 });
 
 const BookingModel = model<Booking>('Booking', bookingSchema);

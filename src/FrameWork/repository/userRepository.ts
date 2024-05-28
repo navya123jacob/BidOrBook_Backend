@@ -5,6 +5,7 @@ import IUserRepo from "../../use_case/interface/userRepo";
 import Encrypt from "../passwordRepository/hashpassword";
 import { PostModel } from "../database/postModel";
 import { Types } from "mongoose";
+import mongoose ,{ ObjectId } from 'mongoose';
 class UserRepository implements IUserRepo {
   private encrypt: Encrypt;
 
@@ -125,6 +126,20 @@ async findOneAndUpdate(_id: Types.ObjectId | string, update: Partial<User>): Pro
       await UserModel.findByIdAndUpdate(userId, { $pull: { posts: postId } });
     } catch (error:any) {
       throw new Error('Error removing post from user: ' + error.message);
+    }
+  }
+
+  async addBookingIdToUser(artistId: string, bookingId: Types.ObjectId) { 
+    try {
+      const user = await UserModel.findById(artistId);
+      if (user) {
+        user.bookings.push(bookingId);
+        await user.save();
+      } else {
+        throw new Error('User not found');
+      }
+    } catch (error) {
+      throw new Error('Failed to add booking ID to user: ' + (error as Error).message);
     }
   }
 }

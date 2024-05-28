@@ -28,7 +28,7 @@ const bookingUseCase = new BookingUseCase(bookingRepository);
 
 const controller = new userController(useCase, sendMail, generateOtp)
 const pController=new PostController()
-const bController=new BookingController(bookingUseCase)
+const bController=new BookingController(bookingUseCase,useCase)
 
 const router=express.Router();
 
@@ -54,6 +54,7 @@ router.delete('/deletepost',protect,(req, res) => pController.deletePost(req,res
 
 //booking
 router.post('/checkavailability',protect,(req, res) => bController.checkAvailability(req,res));
+router.post('/makeBookingreq',protect,(req, res) => bController.makeBookingreq(req,res));
 
 
 
