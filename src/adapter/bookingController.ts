@@ -21,15 +21,42 @@ export class BookingController {
 
   async makeBookingreq(req: Request, res: Response) {
     try {
-      const { artistId, clientId, startDate } = req.body;
+      const { artistId, clientId, dates } = req.body;
       
-      const booking = await this.bookingUseCase.makeBooking(artistId, clientId, startDate);
+      const booking = await this.bookingUseCase.makeBooking(artistId, clientId, dates);
       const bookingId = new Types.ObjectId();
 
       await this.userUseCase.addBookingIdToUser(artistId, bookingId);
       res.json(booking);
     } catch (error) {
       res.status(500).json({ message: 'Internal server error'+ (error as Error).message });
+    }
+  }
+
+  async getBookingsreq(req: Request, res: Response) {
+    try {
+      const { artistId, len } = req.body;
+      if (!artistId) {
+        return res.status(400).json({ message: 'artistId is required' });
+      }
+
+      const result = await this.bookingUseCase.getBookingsreq(artistId as string, len === 'true');
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+  async getBookingsConfirm(req: Request, res: Response) {
+    try {
+      const { artistId, len } = req.body;
+      if (!artistId) {
+        return res.status(400).json({ message: 'artistId is required' });
+      }
+
+      const result = await this.bookingUseCase.getBookingsConfirm(artistId as string, len === 'true');
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
     }
   }
 }

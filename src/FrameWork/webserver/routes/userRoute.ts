@@ -55,7 +55,8 @@ router.delete('/deletepost',protect,(req, res) => pController.deletePost(req,res
 //booking
 router.post('/checkavailability',protect,(req, res) => bController.checkAvailability(req,res));
 router.post('/makeBookingreq',protect,(req, res) => bController.makeBookingreq(req,res));
-
+router.post('/bookingsreq', protect,(req, res) => bController.getBookingsreq(req, res));
+router.post('/bookingsConfirmed', protect,(req, res) => bController.getBookingsConfirm(req, res));
 
 
 
