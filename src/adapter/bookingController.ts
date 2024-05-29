@@ -21,9 +21,9 @@ export class BookingController {
 
   async makeBookingreq(req: Request, res: Response) {
     try {
-      const { artistId, clientId, dates } = req.body;
+      let { artistId, clientId, dates,marked } = req.body;
       
-      const booking = await this.bookingUseCase.makeBooking(artistId, clientId, dates);
+      const booking = await this.bookingUseCase.makeBooking(artistId, clientId, dates,marked);
       const bookingId = new Types.ObjectId();
 
       await this.userUseCase.addBookingIdToUser(artistId, bookingId);
@@ -32,6 +32,7 @@ export class BookingController {
       res.status(500).json({ message: 'Internal server error'+ (error as Error).message });
     }
   }
+  
 
   async getBookingsreq(req: Request, res: Response) {
     try {
@@ -54,6 +55,19 @@ export class BookingController {
       }
 
       const result = await this.bookingUseCase.getBookingsConfirm(artistId as string, len === 'true');
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+  async getMarked(req: Request, res: Response) {
+    try {
+      const { artistId, len } = req.body;
+      if (!artistId) {
+        return res.status(400).json({ message: 'artistId is required' });
+      }
+
+      const result = await this.bookingUseCase.getMarked(artistId as string, len === 'true');
       res.json(result);
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' });

@@ -8,8 +8,8 @@ export class BookingUseCase {
       return bookings
     }
 
-    async makeBooking(artistId: string, clientId: string, dates: Date[]) {
-      const booking = await this.bookingRepository.createBooking(artistId, clientId, dates);
+    async makeBooking(artistId: string, clientId: string, dates: Date[],marked:Boolean) {
+      const booking = await this.bookingRepository.createBooking(artistId, clientId, dates,marked);
       return booking;
     }
 
@@ -22,6 +22,13 @@ export class BookingUseCase {
     }
     async getBookingsConfirm(artistId: string, len: boolean) {
       const bookings = await this.bookingRepository.getBookingsByArtistIdConfirm(artistId);
+      if (len) {
+        return { length: bookings.length };
+      }
+      return { bookings };
+    }
+    async getMarked(artistId: string, len: boolean) {
+      const bookings = await this.bookingRepository.getBookingsByArtistIdMarked(artistId);
       if (len) {
         return { length: bookings.length };
       }

@@ -20,14 +20,24 @@ export class BookingRepository {
 }
 
 
-  async createBooking(artistId: string, clientId: string, dates: Date[]): Promise<Booking> {
+  async createBooking(artistId: string, clientId: string, dates: Date[],marked:Boolean): Promise<Booking> {
+    let booking;
     
-    const booking = await BookingModel.create({
+    if(marked){
+      booking = await BookingModel.create({
+        artistId,
+        clientId,
+        date_of_booking: dates,
+        status: 'marked'
+      });
+    }
+    else{
+    booking = await BookingModel.create({
       artistId,
       clientId,
       date_of_booking: dates,
       status: 'pending'
-    });
+    });}
   
     return booking;
   }
@@ -44,6 +54,15 @@ export class BookingRepository {
   async getBookingsByArtistIdConfirm(artistId: string): Promise<Booking[]> {
     try {
       const bookings = await BookingModel.find({ artistId,status:'confirmed' }).exec();
+      return bookings;
+    } catch (error) {
+      console.error('Error getting bookings by artist ID:', error);
+      throw new Error('Failed to get bookings');
+    }
+  }
+  async getBookingsByArtistIdMarked(artistId: string): Promise<Booking[]> {
+    try {
+      const bookings = await BookingModel.find({ artistId,status:'marked' }).exec();
       return bookings;
     } catch (error) {
       console.error('Error getting bookings by artist ID:', error);

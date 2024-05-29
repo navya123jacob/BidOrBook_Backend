@@ -10,7 +10,7 @@ const addressSchema = new Schema({
 });
 
 const bookingSchema = new Schema<Booking>({
-  status: { type: String, required: true, enum: ['pending', 'confirmed'],default:'pending' },
+  status: { type: String, required: true, enum: ['pending', 'confirmed','marked'],default:'pending' },
   clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   artistId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   location: { 

@@ -57,6 +57,7 @@ router.post('/checkavailability',protect,(req, res) => bController.checkAvailabi
 router.post('/makeBookingreq',protect,(req, res) => bController.makeBookingreq(req,res));
 router.post('/bookingsreq', protect,(req, res) => bController.getBookingsreq(req, res));
 router.post('/bookingsConfirmed', protect,(req, res) => bController.getBookingsConfirm(req, res));
+router.post('/marked', protect,(req, res) => bController.getMarked(req, res));
 
 
 
