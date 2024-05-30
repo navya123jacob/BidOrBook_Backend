@@ -5,7 +5,15 @@ import path from "path";
 import userRoute from "../routes/userRoute";
 
 const app: Express = express();
+app.use((req, res, next) => {
+    console.info(`METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.socket.remoteAddress}]`);
 
+    res.on('finish', () => {
+        console.info(`METHOD: [${req.method}] - URL: [${req.url}] - STATUS: [${res.statusCode}] - IP: [${req.socket.remoteAddress}]`);
+    });
+
+    next();
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

@@ -44,7 +44,7 @@ export class BookingRepository {
 
   async getBookingsByArtistId(artistId: string): Promise<Booking[]> {
     try {
-      const bookings = await BookingModel.find({ artistId,status:'pending' }).exec();
+      const bookings = await BookingModel.find({ artistId,status:'pending' }).populate('clientId').exec();
       return bookings;
     } catch (error) {
       console.error('Error getting bookings by artist ID:', error);
@@ -53,7 +53,7 @@ export class BookingRepository {
   }
   async getBookingsByArtistIdConfirm(artistId: string): Promise<Booking[]> {
     try {
-      const bookings = await BookingModel.find({ artistId,status:'confirmed' }).exec();
+      const bookings = await BookingModel.find({ artistId,status:'confirmed' }).populate('clientId').exec();
       return bookings;
     } catch (error) {
       console.error('Error getting bookings by artist ID:', error);
@@ -62,7 +62,7 @@ export class BookingRepository {
   }
   async getBookingsByArtistIdMarked(artistId: string): Promise<Booking[]> {
     try {
-      const bookings = await BookingModel.find({ artistId,status:'marked' }).exec();
+      const bookings = await BookingModel.find({ artistId,status:'marked' }).populate('clientId').exec();
       return bookings;
     } catch (error) {
       console.error('Error getting bookings by artist ID:', error);

@@ -1,18 +1,25 @@
-require('dotenv').config()
+require('dotenv').config();
 import app from "./FrameWork/webserver/config/app";
 import connectDb from "./FrameWork/webserver/config/db";
-// import socket  from './socket/socket'
-import http from 'http'
+import { ServerSocket } from "./FrameWork/utils/Soket";
+import http from 'http';
 
-const port =process.env.PORT
-const server = http.createServer(app)
+const port = process.env.PORT || 3000; 
+const server = http.createServer(app);
 
-const start = ()=>{
-    app.listen(port,()=>{
-        console.log(`server started on http://localhost:${port}`);
-        connectDb()
-        // socket(server)
-    })
-}
+// Initialize Socket.IO server
+new ServerSocket(server);
 
-start()
+const start = async () => {
+    try {
+        await connectDb(); 
+        server.listen(port, () => { 
+            console.log(`Server started on http://localhost:${port}`);
+        });
+    } catch (error) {
+        console.error('Failed to connect to the database', error);
+        process.exit(1); 
+    }
+};
+
+start();
