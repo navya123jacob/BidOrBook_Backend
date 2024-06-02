@@ -9,20 +9,30 @@ class MessageController implements IMessageController {
         this.messageUseCase = messageUseCase;
     }
 
-    async sendMessage(req: Request, res: Response): Promise<void> {
-        try {
-            const { senderId, receiverId, message } = req.body;
-            const sentMessage = await this.messageUseCase.sendMessage(senderId, receiverId, message);
-            res.status(201).json(sentMessage);
-        } catch (error) {
-            console.error('Error sending message:', error);
-            res.status(500).json({ message: 'Internal server error' });
+
+
+async sendMessage(req: Request, res: Response): Promise<void> {
+    try {
+        const { senderId, receiverId, message } = req.body;
+         
+        if (!senderId || !receiverId || !message) {
+            res.status(400).json({ message: 'senderId, receiverId, and message are required' });
+            return;
         }
+        const sentMessage = await this.messageUseCase.sendMessage(senderId, receiverId, message);
+       
+        res.status(201).json(sentMessage);
+    } catch (error) {
+        console.error('Error sending message:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
+}
+
+      
 
     async getMessages(req: Request, res: Response): Promise<void> {
         try {
-            const { senderId, receiverId } = req.params;
+            const { senderId, receiverId } = req.body;
             const messages = await this.messageUseCase.getMessages(senderId, receiverId);
             res.status(200).json(messages);
         } catch (error) {

@@ -33,6 +33,6 @@ router.post('/marked', protect, (req, res) => bookingController.getMarked(req, r
 
 // Messaging routes
 router.post('/sendMessage', protect, (req, res) => messageController.sendMessage(req, res));
-router.get('/getMessages/:senderId/:receiverId', protect, (req, res) => messageController.getMessages(req, res));
+router.post('/getMessages', protect, (req, res) => messageController.getMessages(req, res));
 
 export default router;

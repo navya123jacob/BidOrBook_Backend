@@ -1,7 +1,7 @@
 import { MessageModelInterface as Message } from "../Domain/Message";
 import IMessageRepository from "./interface/RepositoryInterface/IconvRepo";
 import IMessageUseCase from "./interface/useCaseInterface/IConvUsecase";
-
+import { ObjectId } from 'mongoose';
 class MessageUseCase implements IMessageUseCase {
     private messageRepository: IMessageRepository;
 
@@ -9,16 +9,19 @@ class MessageUseCase implements IMessageUseCase {
         this.messageRepository = messageRepository;
     }
 
-    async sendMessage(senderId: string, receiverId: string, message: string): Promise<Message> {
+    async sendMessage(senderId: ObjectId, receiverId: ObjectId, message: string): Promise<Message> {
         try {
-            const sentMessage = await this.messageRepository.sendMessage(senderId, receiverId, message);
-            return sentMessage;
+          const sentMessage = await this.messageRepository.sendMessage(senderId, receiverId, message);
+          return sentMessage;
         } catch (error) {
-            throw new Error('Failed to send message: ' + (error as Error).message);
+          throw new Error('Failed to send message: ' + (error as Error).message);
         }
-    }
+      }
+      
+      
 
-    async getMessages(senderId: string, receiverId: string): Promise<Message[]> {
+
+    async getMessages(senderId: ObjectId, receiverId: ObjectId): Promise<Message[]> {
         try {
             const messages = await this.messageRepository.getMessages(senderId, receiverId);
             return messages;
