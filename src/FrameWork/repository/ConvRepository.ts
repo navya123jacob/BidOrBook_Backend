@@ -1,6 +1,8 @@
 import { MessageModelInterface as Message } from "../database/Message";
 import { MessageModel } from "../database/Message";
-class MessageRepository {
+import IMessageRepository from "../../use_case/interface/RepositoryInterface/IconvRepo";
+
+class MessageRepository implements IMessageRepository {
     async sendMessage(senderId: string, receiverId: string, message: string): Promise<Message> {
         const newMessage = new MessageModel({
             senderId,

@@ -1,33 +1,32 @@
-import {User} from "../Domain/userEntity";
-import Encrypt from "../FrameWork/passwordRepository/hashpassword";
-import UserRepository from "../FrameWork/repository/userRepository";
-import jwtToken from "../FrameWork/passwordRepository/jwtpassword";
-import { ObjectId } from 'mongodb'; 
-import { Types } from "mongoose";
+import { User } from "../Domain/userEntity";
+import { Types, ObjectId } from "mongoose";
+import IUserRepo from "./interface/RepositoryInterface/IuserRepo";
+import Hashpassword from "./interface/services/Ihashpassword";
+import JWT from "./interface/services/Ijwt";
+import IUserUseCase from "./interface/useCaseInterface/IUserUseCase";
 
-class UserUseCase {
-  private Encrypt: Encrypt;
-  private UserRepository: UserRepository;
-  private JWTToken: jwtToken;
+class UserUseCase implements IUserUseCase {
+  private Encrypt: Hashpassword;
+  private userRepository: IUserRepo;
+  private jwtToken: JWT;
 
   constructor(
-    Encrypt: Encrypt,
-    UserRepository: UserRepository,
-    JWTToken: jwtToken,
+    Encrypt: Hashpassword,
+    userRepository: IUserRepo,
+    jwtToken: JWT,
   ) {
-    (this.Encrypt = Encrypt),
-    (this.UserRepository = UserRepository),
-    (this.JWTToken = JWTToken);
+    this.Encrypt = Encrypt;
+    this.userRepository = userRepository;
+    this.jwtToken = jwtToken;
   }
-
-  async signup(user: User) {
-    
-    const existingUser = await this.UserRepository.findByEmail(user.email);
+  
+  async signup(user: User): Promise<{ status: number; data: { status: boolean; message: string } }> {
+    const existingUser = await this.userRepository.findByEmail(user.email);
     if (existingUser) {
       return {
         status: 401,
         data: {
-          status:false,
+          status: false,
           message: "User already exists",
         }
       };
@@ -42,15 +41,15 @@ class UserUseCase {
     }
   }
 
-  async resetPass1(email:string) {
-    const existingUser = await this.UserRepository.findByEmail(email);
+  async resetPass1(email: string): Promise<{ status: number; data: { state: boolean; data?: User; message: string } }> {
+    const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       return {
         status: 200,
         data: {
           state: true,
           data: existingUser,
-          message: "User exisists",
+          message: "User exists",
         }
       };
     } else {
@@ -64,8 +63,8 @@ class UserUseCase {
     }
   }
 
-  async updatePass(email: string, newPassword: string) {
-    const userData = await this.UserRepository.findByEmail(email);
+  async updatePass(email: string, newPassword: string): Promise<{ status: number; data: { message: string } } | { status: number; data: User; message: string }> {
+    const userData = await this.userRepository.findByEmail(email);
     if (!userData) {
         return { status: 404, data: { message: 'User not found.' } };
     }
@@ -80,162 +79,181 @@ class UserUseCase {
 
     const id = userData._id;
     if (id) {
-        const updatedUserData = await this.UserRepository.findOneAndUpdate(id, { password: await this.Encrypt.generateHash(newPassword) });
-        return { status: 200, data: updatedUserData, message: 'Password changed' };
+        const updatedUserData = await this.userRepository.findOneAndUpdate(id, { password: await this.Encrypt.generateHash(newPassword) });
+        if (updatedUserData) {
+            return { status: 200, data: updatedUserData, message: 'Password changed' };
+        } else {
+            return { status: 404, data: { message: 'User not found.' } };
+        }
     } else {
         return { status: 400, data: { message: 'User ID is undefined.' } };
     }
 }
 
-  async newUser(user:User){
-    console.log(user);
-   
-    
-    const hashedPass = await this.Encrypt.generateHash(user.password)
-    const newUser = { ...user,is_verified:true,password: hashedPass }
-    await this.UserRepository.save(newUser);
-    return {
+async newUser(user: User): Promise<{ status: number; data: { status: boolean; message: string } }> {
+  const hashedPass = await this.Encrypt.generateHash(user.password);
+  const newUser = { ...user, is_verified: true, password: hashedPass };
+  await this.userRepository.save(newUser);
+  return {
       status: 200,
       data: { status: true, message: 'Registration successful!' }
-    }
-  }
-  async login(user: User) {
-    try {
-      const userData = await this.UserRepository.findByEmail(user.email);
-      
+  };
+}
+async login(user: User): Promise<{ status: number; data: { message: string; accessToken: string; refreshToken: string } } | { status: number; data: { message: User; accessToken: string; refreshToken: string } }> {
+  try {
+      const userData = await this.userRepository.findByEmail(user.email);
       let accessToken = '';
-      let refreshToken='';
+      let refreshToken = '';
 
       if (userData) {
-        if (userData.is_blocked) {
-          return {
-            status: 400,
-            data: {
-              message: 'You have been blocked by admin!',
-              token: ''
-            }
-          };
-        }
+          if (userData.is_blocked) {
+              return {
+                  status: 400,
+                  data: {
+                      message: 'You have been blocked by admin!',
+                      accessToken: '',
+                      refreshToken: ''
+                  }
+              };
+          }
 
-        const passwordMatch = await this.Encrypt.compare(user.password, userData.password);
+          const passwordMatch = await this.Encrypt.compare(user.password, userData.password);
 
-        if (passwordMatch || userData.is_google) {
-          const userId = userData?._id.toHexString();
-          if (userId) {
-            accessToken = this.JWTToken.generateAccessToken(userId, 'user');
-            console.log(accessToken)
-            refreshToken = this.JWTToken.generateRefreshToken(userId);
-            return {
-              status: 200,
-              data: {
-                message: userData,
-                accessToken,
-                refreshToken
+          if (passwordMatch || userData.is_google) {
+              const userId = userData?._id.toHexString();
+              if (userId) {
+                  accessToken = this.jwtToken.generateAccessToken(userId, 'user');
+                  refreshToken = this.jwtToken.generateRefreshToken(userId);
+                  return {
+                      status: 200,
+                      data: {
+                          message: userData,
+                          accessToken,
+                          refreshToken
+                      }
+                  };
               }
-            };
+          } else {
+              return {
+                  status: 400,
+                  data: {
+                      message: 'Invalid email or password!',
+                      accessToken: '',
+                      refreshToken: ''
+                  }
+              };
           }
-        } else {
-          return {
-            status: 400,
-            data: {
-              message: 'Invalid email or password!',
-              accessToken
-            }
-          };
-        }
       } else {
-        return {
-          status: 400,
-          data: {
-            message: 'Invalid email or password!',
-            accessToken
-          }
-        };
+          return {
+              status: 400,
+              data: {
+                  message: 'Invalid email or password!',
+                  accessToken: '',
+                  refreshToken: ''
+              }
+          };
       }
-    } catch (error) {
+  } catch (error) {
       console.error('Login failed:', error);
 
       return {
-        status: 500,
-        data: {
-          message: 'Internal server error',
-          token: ''
-        }
+          status: 500,
+          data: {
+              message: 'Internal server error',
+              accessToken: '',
+              refreshToken: ''
+          }
       };
-    }
   }
 
-  async saveRefreshToken(id: string | undefined,refreshToken:string | undefined) {
-    const User = await this.UserRepository.updateRefreshToken(id,refreshToken);
-    if (User) {
-      return {
-        status: 200,
-        data: User,
-      };
-    } else {
-      return {
-        status: 400,
-        data: "Failed to add Token",
-      };
-    }
-  }
+  return {
+      status: 500,
+      data: {
+          message: 'Unexpected error',
+          accessToken: '',
+          refreshToken: ''
+      }
+  };
+}
 
-  async updateUser(id: string, updateData: Partial<User>): Promise<User | null> {
-    return this.UserRepository.updateUser(id, updateData);
+async saveRefreshToken(id: string | undefined, refreshToken: string | undefined): Promise<{ status: number; data: any }> {
+  const user = await this.userRepository.updateRefreshToken(id, refreshToken);
+  if (user) {
+    return {
+      status: 200,
+      data: user,
+    };
+  } else {
+    return {
+      status: 400,
+      data: "Failed to add Token",
+    };
   }
+}
 
-  async addPostToUser(userId: string, postId: ObjectId): Promise<void> {
-    try {
-      const user = await this.UserRepository.findById(userId);
+async updateUser(id: string, updateData: Partial<User>): Promise<User | null> {
+  return this.userRepository.updateUser(id, updateData);
+}
+
+async addPostToUser(userId: string, postId: Types.ObjectId): Promise<{ status: number; message: string }> {
+  try {
+      const user = await this.userRepository.findById(userId);
       if (!user) {
-        console.error('User not found');
-        return;
+          console.error('User not found');
+          return { status: 404, message: 'User not found' };
       }
 
       user.posts.unshift(postId);
-      await this.UserRepository.updateUser(userId, { posts: user.posts });
-    } catch (error) {
+      await this.userRepository.updateUser(userId, { posts: user.posts });
+      return { status: 200, message: 'Post added successfully' };
+  } catch (error) {
       console.error('Error updating user posts:', error);
-    }
+      return { status: 500, message: 'Error updating user posts' };
   }
+}
 
-  
-  async getAllPosts(filters: { userid?: string; category?: string;searchPlaceholder?: string;usernotid?:string}): Promise<User[]> {
-    try {
-      return await this.UserRepository.getAllPosts(filters);
-    } catch (error) {
-      throw new Error('Failed to fetch posts');
-    }
-  }
-  async singleUserPost(userId: string): Promise<any> {
-    try {
-      return await this.UserRepository.singleUserPost(userId);
-    } catch (error:unknown) {
+async singleUserPost(userId: string): Promise<any> {
+  try {
+      return await this.userRepository.singleUserPost(userId);
+  } catch (error: unknown) {
       throw new Error('Error fetching user post: ' + (error as Error).message);
-    }
   }
-
-  async removePostFromUser(userId: string, postId: string): Promise<void> {
-    try {
-      await this.UserRepository.removePost(userId, postId);
-    } catch (error:any) {
-      throw new Error('Error removing post from user: ' + error.message);
-    }
+}
+async removePostFromUser(userId: string, postId: string): Promise<{ status: number; message: string }> {
+  try {
+      await this.userRepository.removePost(userId, postId);
+      return { status: 200, message: 'Post removed successfully' };
+  } catch (error) {
+      console.error('Error removing post from user:', error);
+      return { status: 500, message: 'Error removing post from user' };
   }
+}
 
-  
-  async addBookingIdToUser(artistId: string, bookingId: Types.ObjectId) {
-    try {
-      await this.UserRepository.addBookingIdToUser(artistId, bookingId);
+async getAllPosts(filters: { userid?: string; category?: string; searchPlaceholder?: string; usernotid?: string }): Promise<User[]> {
+  try {
+      return await this.userRepository.getAllPosts(filters);
+  } catch (error) {
+      console.error('Failed to fetch posts:', error);
+      throw new Error('Failed to fetch posts');
+  }
+}
+
+async addBookingIdToUser(artistId: string, bookingId: Types.ObjectId): Promise<{ status: number; data: { message: string } }> {
+  try {
+      await this.userRepository.addBookingIdToUser(artistId, bookingId);
       return {
-        status: 200,
-        data: { message: 'Booking ID added to user successfully' }
+          status: 200,
+          data: { message: 'Booking ID added to user successfully' }
       };
-    } catch (error) {
-      throw new Error('Failed to add booking ID to user: ' + (error as Error).message);
-    }
+  } catch (error) {
+      console.error('Failed to add booking ID to user:', error);
+      return {
+          status: 500,
+          data: { message: 'Failed to add booking ID to user' }
+      };
   }
- 
+}
+
 }
 
 export default UserUseCase;

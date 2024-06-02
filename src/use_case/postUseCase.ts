@@ -1,26 +1,26 @@
-
-
 import { Post } from "../Domain/postEntity";
-import { postRepository } from "../FrameWork/repository/postRepository";
+import IPostUseCase from "./interface/useCaseInterface/IPostUsecase";
+import IPostRepository from "./interface/RepositoryInterface/IpostRepo";
 
-class PostUseCase {
+class PostUseCase implements IPostUseCase {
+  constructor(private postRepository: IPostRepository) {}
+
   async createPost(postInfo: Post): Promise<Post> {
     try {
-      const post = await postRepository.create(postInfo);
+      const post = await this.postRepository.create(postInfo);
       return post;
     } catch (error) {
       throw new Error('Failed to create post');
     }
   }
+
   async deletePost(postId: string): Promise<void> {
     try {
-      await postRepository.deletePost(postId);
+      await this.postRepository.deletePost(postId);
     } catch (error:any) {
       throw new Error('Error deleting post: ' + error.message);
     }
   }
-
 }
 
-const postUseCase = new PostUseCase();
-export { postUseCase };
+export default PostUseCase;

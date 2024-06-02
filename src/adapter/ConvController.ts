@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
-import MessageUseCase from '../use_case/ConvUseCase';
+import IMessageUseCase from '../use_case/interface/useCaseInterface/IConvUsecase';
+import IMessageController from '../use_case/interface/ControllerInterface/IConvController';
 
-class MessageController {
-    private messageUseCase: MessageUseCase;
+class MessageController implements IMessageController {
+    private messageUseCase: IMessageUseCase;
 
-    constructor(messageUseCase: MessageUseCase) {
+    constructor(messageUseCase: IMessageUseCase) {
         this.messageUseCase = messageUseCase;
     }
 

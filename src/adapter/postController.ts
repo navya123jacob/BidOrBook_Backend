@@ -1,22 +1,17 @@
 import { Request, Response } from 'express';
 import { Post } from '../Domain/postEntity';
-import { postUseCase } from '../use_case/postUseCase';
-import UserUseCase from '../use_case/userUsecases'; 
+import IPostUseCase from '../use_case/interface/useCaseInterface/IPostUsecase';
+import IUserUseCase from '../use_case/interface/useCaseInterface/IUserUseCase';
 import { cloudinary } from '../FrameWork/utils/CloudinaryConfig';
-import Encrypt from "../FrameWork/passwordRepository/hashpassword";
-import UserRepository from "../FrameWork/repository/userRepository";
-import jwtToken from "../FrameWork/passwordRepository/jwtpassword";
+import IPostController from '../use_case/interface/ControllerInterface/IpostController';
+class PostController implements IPostController {
+  private userUseCase: IUserUseCase;
+  private postUseCase: IPostUseCase;
 
-export class PostController {
-    private userUseCase: UserUseCase; 
-
-    constructor() {
-     
-      const encrypt = new Encrypt();
-      const userRepository = new UserRepository(encrypt);
-      const jwt = new jwtToken();
-      this.userUseCase = new UserUseCase(encrypt, userRepository, jwt);
-    }
+  constructor(userUseCase: IUserUseCase, postUseCase: IPostUseCase) {
+    this.userUseCase = userUseCase;
+    this.postUseCase = postUseCase;
+  }
 
   async createPost(req: Request, res: Response): Promise<void> {
     try {
@@ -38,8 +33,7 @@ export class PostController {
         }
       }
 
-      
-      const createdPost = await postUseCase.createPost(updateData);
+      const createdPost = await this.postUseCase.createPost(updateData);
       await this.userUseCase.addPostToUser(userid, createdPost._id);
 
       res.status(201).json({ message: 'Post created successfully', post: createdPost });
@@ -49,13 +43,11 @@ export class PostController {
     }
   }
 
-  
   async deletePost(req: Request, res: Response): Promise<void> {
     try {
-      
       const { postId, userId } = req.body;
 
-      await postUseCase.deletePost(postId);
+      await this.postUseCase.deletePost(postId);
       await this.userUseCase.removePostFromUser(userId, postId);
 
       res.status(200).json({ message: 'Post deleted successfully' });
@@ -64,5 +56,6 @@ export class PostController {
       res.status(500).json({ error: 'Failed to delete post' });
     }
   }
-  
 }
+
+export default PostController;

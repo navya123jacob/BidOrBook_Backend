@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
-
-class sendMail {
+import IMailService from '../../use_case/interface/services/ISendMail';
+class SendMail implements IMailService{
   private transporter: nodemailer.Transporter;
 
   constructor() {
@@ -13,12 +13,11 @@ class sendMail {
     });
   }
 
-  sendVerificationEmail(email: string, verificationToken: string): Promise<void> {
-    
+  sendVerificationEmail(email: string, verificationToken: string): Promise<string> {
     const mailOptions: nodemailer.SendMailOptions = {
       from: 'navyatjacob@gmail.com',
       to: email,
-      subject: ' Email Verification',
+      subject: 'Email Verification',
       text: `${email}, your verification code is: ${verificationToken}. Do not share this code with anyone.`,
     };
 
@@ -29,11 +28,11 @@ class sendMail {
           reject(err);
         } else {
           console.log('Verification code sent');
-          resolve();
+          resolve(verificationToken);
         }
       });
     });
   }
 }
 
-export default sendMail;
+export default SendMail;

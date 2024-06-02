@@ -1,11 +1,12 @@
 import { User } from "../../Domain/userEntity";
 import { Post } from "../../Domain/postEntity";
 import { UserModel } from "../database/userModel";
-import IUserRepo from "../../use_case/interface/userRepo";
+import IUserRepo from "../../use_case/interface/RepositoryInterface/IuserRepo";
 import Encrypt from "../passwordRepository/hashpassword";
 import { PostModel } from "../database/postModel";
 import { Types } from "mongoose";
-import mongoose ,{ ObjectId } from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
+
 class UserRepository implements IUserRepo {
   private encrypt: Encrypt;
 

@@ -1,15 +1,17 @@
 import { Request, Response } from 'express';
-import UserUseCase from '../use_case/userUsecases';
-import { BookingUseCase } from '../use_case/BookingUseCase';
+import IUserUseCase from '../use_case/interface/useCaseInterface/IUserUseCase';
+import { IBookingUseCase } from '../use_case/interface/useCaseInterface/IBookingUseCase';
 import { Types } from 'mongoose';
+import { Booking } from '../Domain/Booking';
+import BookingControllerInterface from '../use_case/interface/ControllerInterface/IbookingController';
 
-export class BookingController {
+export class BookingController implements BookingControllerInterface {
   constructor(
-    private bookingUseCase: BookingUseCase,
-    private userUseCase: UserUseCase
+    private bookingUseCase: IBookingUseCase,
+    private userUseCase: IUserUseCase
   ) {}
 
-  async checkAvailability(req: Request, res: Response) {
+  async checkAvailability(req: Request, res: Response): Promise<void> {
     try {
       const { artistId, startDate, endDate } = req.body;
       const result = await this.bookingUseCase.checkdate(artistId, startDate, endDate);
@@ -19,11 +21,11 @@ export class BookingController {
     }
   }
 
-  async makeBookingreq(req: Request, res: Response) {
+  async makeBookingreq(req: Request, res: Response): Promise<void> {
     try {
-      let { artistId, clientId, dates,marked } = req.body;
+      let { artistId, clientId, dates, marked } = req.body;
       
-      const booking = await this.bookingUseCase.makeBooking(artistId, clientId, dates,marked);
+      const booking = await this.bookingUseCase.makeBooking(artistId, clientId, dates, marked);
       const bookingId = new Types.ObjectId();
 
       await this.userUseCase.addBookingIdToUser(artistId, bookingId);
@@ -32,13 +34,13 @@ export class BookingController {
       res.status(500).json({ message: 'Internal server error'+ (error as Error).message });
     }
   }
-  
 
-  async getBookingsreq(req: Request, res: Response) {
+  async getBookingsreq(req: Request, res: Response): Promise<void> {
     try {
       const { artistId, len } = req.body;
       if (!artistId) {
-        return res.status(400).json({ message: 'artistId is required' });
+        res.status(400).json({ message: 'artistId is required' });
+        return;
       }
 
       const result = await this.bookingUseCase.getBookingsreq(artistId as string, len === 'true');
@@ -47,11 +49,13 @@ export class BookingController {
       res.status(500).json({ message: 'Internal server error' });
     }
   }
-  async getBookingsConfirm(req: Request, res: Response) {
+
+  async getBookingsConfirm(req: Request, res: Response): Promise<void> {
     try {
       const { artistId, len } = req.body;
       if (!artistId) {
-        return res.status(400).json({ message: 'artistId is required' });
+        res.status(400).json({ message: 'artistId is required' });
+        return;
       }
 
       const result = await this.bookingUseCase.getBookingsConfirm(artistId as string, len === 'true');
@@ -60,11 +64,13 @@ export class BookingController {
       res.status(500).json({ message: 'Internal server error' });
     }
   }
-  async getMarked(req: Request, res: Response) {
+
+  async getMarked(req: Request, res: Response): Promise<void> {
     try {
       const { artistId, len } = req.body;
       if (!artistId) {
-        return res.status(400).json({ message: 'artistId is required' });
+        res.status(400).json({ message: 'artistId is required' });
+        return;
       }
 
       const result = await this.bookingUseCase.getMarked(artistId as string, len === 'true');
