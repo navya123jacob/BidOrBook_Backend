@@ -35,7 +35,8 @@ export class BookingRepository implements IBookingRepository {
         status: 'pending'
       });
     }
-    return booking;
+    const populatedBooking = await BookingModel.findById(booking._id).populate('clientId').exec();
+    return populatedBooking as Booking;
   }
 
   async getBookingsByArtistId(artistId: string): Promise<Booking[]> {
@@ -67,6 +68,27 @@ export class BookingRepository implements IBookingRepository {
       throw new Error('Failed to get bookings');
     }
   }
+
+  async singleBooking(artistId: string, clientId: string): Promise<Booking|null> {
+    try {
+      const booking = await BookingModel.findOne({ artistId, clientId }).populate('clientId').exec();
+      
+      return booking;
+    } catch (error) {
+      throw new Error('Failed to add booking ID to user: ' + (error as Error).message);
+    }
+  }
+
+  async deleteBooking(bookingId: string): Promise<void> {
+    try {
+      await BookingModel.findByIdAndDelete({_id:bookingId}).exec();
+    } catch (error) {
+      console.error('Error deleting booking:', error);
+      throw new Error('Failed to delete booking');
+    }
+  }
+
+  
 }
 
 export default BookingRepository;

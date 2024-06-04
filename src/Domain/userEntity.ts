@@ -24,7 +24,6 @@ export interface User {
     givenReviews: Types.ObjectId[];
     purchasedItems: Types.ObjectId[];
     bookings: Types.ObjectId[];
-    marked: Types.ObjectId[];
     is_verified: boolean;
     is_google: boolean;
     is_blocked: boolean;

@@ -3,7 +3,9 @@ import { IBookingUseCase } from "./interface/useCaseInterface/IBookingUseCase";
 import { Booking } from "../Domain/Booking";
 
 export class BookingUseCase implements IBookingUseCase {
-    constructor(private bookingRepository: IBookingRepository) {}
+    constructor(private bookingRepository: IBookingRepository,
+      
+    ) {}
 
     async checkdate(artistId: string, startDate: Date, endDate: Date): Promise<Date[]> {
         const bookings = await this.bookingRepository.findByArtistIdAndDateRange(artistId, startDate, endDate);
@@ -38,4 +40,17 @@ export class BookingUseCase implements IBookingUseCase {
         }
         return { bookings };
     }
+
+    async singleBooking(artistId: string,clientId: string): Promise<Booking|null> { 
+        try {
+          const booking = await this.bookingRepository.singleBooking(artistId,clientId);
+         return booking
+        } catch (error) {
+          throw new Error('Failed to add booking ID to user: ' + (error as Error).message);
+        }
+      }
+      async cancelBooking(bookingId: string, userId: string): Promise<void> {
+        await this.bookingRepository.deleteBooking(bookingId);
+       
+      }
 }

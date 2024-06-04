@@ -24,7 +24,6 @@ const userSchema: Schema<User & Document> = new mongoose.Schema({
     givenReviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review', default: [] }],
     purchasedItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PurchasedItem', default: [] }],
     bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Booking', default: [] }],
-    marked: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', default: [] }],
     is_verified: { type: Boolean, default: false },
     is_google: { type: Boolean, default: false },
     profile: {

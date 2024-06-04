@@ -143,6 +143,22 @@ async findOneAndUpdate(_id: Types.ObjectId | string, update: Partial<User>): Pro
       throw new Error('Failed to add booking ID to user: ' + (error as Error).message);
     }
   }
+
+  async pullBookingId(userId: string, bookingId: string): Promise<void> {
+    try {
+
+      await UserModel.findByIdAndUpdate(
+        { _id: userId },
+        {
+          $pull: { bookings: bookingId }
+        }
+      ).exec();
+    } catch (error) {
+      console.error('Error removing booking ID from user:', error);
+      throw new Error('Failed to remove booking ID from user');
+    }
+  }
+  
 }
 
 export default UserRepository;

@@ -254,6 +254,10 @@ async addBookingIdToUser(artistId: string, bookingId: Types.ObjectId): Promise<{
   }
 }
 
+async removeBookingIdFromUser(userId: string, bookingId: string): Promise<void> {
+  await this.userRepository.pullBookingId(userId, bookingId);
+}
+
 }
 
 export default UserUseCase;

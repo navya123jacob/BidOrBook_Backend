@@ -26,7 +26,7 @@ export class BookingController implements BookingControllerInterface {
       let { artistId, clientId, dates, marked } = req.body;
       
       const booking = await this.bookingUseCase.makeBooking(artistId, clientId, dates, marked);
-      const bookingId = new Types.ObjectId();
+      const bookingId = booking._id
 
       await this.userUseCase.addBookingIdToUser(artistId, bookingId);
       res.json(booking);
@@ -79,4 +79,40 @@ export class BookingController implements BookingControllerInterface {
       res.status(500).json({ message: 'Internal server error' });
     }
   }
+
+  async getSingleBooking(req: Request, res: Response): Promise<void> {
+    try {
+        const { artistId, clientId } = req.params;
+        const booking: Booking | null = await this.bookingUseCase.singleBooking(artistId, clientId);
+
+        if (booking === null) {
+            
+            res.status(404).json({ message: 'Booking not found' });
+        } else {
+           
+            res.status(200).json(booking);
+        }
+    } catch (error) {
+        console.error('Error getting single booking:', error);
+        res.status(500).json({ message: 'Failed to get single booking' });
+    }
+}
+
+async cancelBooking(req: Request, res: Response): Promise<void> {
+  try {
+    const { bookingId, userId } = req.body;
+    if (!bookingId || !userId) {
+      res.status(400).json({ message: 'bookingId and userId are required' });
+      return;
+    }
+
+    await this.bookingUseCase.cancelBooking(bookingId, userId);
+    await this.userUseCase.removeBookingIdFromUser(userId, bookingId);
+    res.status(200).json({ message: 'Booking cancelled successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error: ' + (error as Error).message });
+  }
+}
+
+
 }

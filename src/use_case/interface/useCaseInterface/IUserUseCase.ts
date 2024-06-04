@@ -14,6 +14,7 @@ interface IUserUseCase {
   singleUserPost(userId: string): Promise<any>;
  removePostFromUser(userId: string, postId: string): Promise<{ status: number; message: string }>;
 addBookingIdToUser(artistId: string, bookingId: Types.ObjectId): Promise<{ status: number; data: { message: string } }>;
+removeBookingIdFromUser(userId: string, bookingId: string): Promise<void>
 }
 
 export default IUserUseCase;

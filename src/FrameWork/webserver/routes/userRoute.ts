@@ -30,6 +30,8 @@ router.post('/makeBookingreq', protect, (req, res) => bookingController.makeBook
 router.post('/bookingsreq', protect, (req, res) => bookingController.getBookingsreq(req, res));
 router.post('/bookingsConfirmed', protect, (req, res) => bookingController.getBookingsConfirm(req, res));
 router.post('/marked', protect, (req, res) => bookingController.getMarked(req, res));
+router.get('/bookings/:artistId/:clientId', (req, res) => bookingController.getSingleBooking(req, res));
+router.post('/cancel-booking', bookingController.cancelBooking.bind(bookingController));
 
 // Messaging routes
 router.post('/sendMessage', protect, (req, res) => messageController.sendMessage(req, res));

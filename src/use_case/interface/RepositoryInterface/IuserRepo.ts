@@ -12,6 +12,7 @@ interface IUserRepo {
     singleUserPost(userId: string): Promise<any>;
     removePost(userId: string, postId: string): Promise<void>;
     addBookingIdToUser(artistId: string, bookingId: Types.ObjectId): Promise<void>;
+    pullBookingId(userId: string, bookingId: string): Promise<void>;
 }
 
 export default IUserRepo;

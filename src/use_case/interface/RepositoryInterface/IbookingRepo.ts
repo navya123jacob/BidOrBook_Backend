@@ -6,6 +6,8 @@ interface IBookingRepository {
   getBookingsByArtistId(artistId: string): Promise<Booking[]>;
   getBookingsByArtistIdConfirm(artistId: string): Promise<Booking[]>;
   getBookingsByArtistIdMarked(artistId: string): Promise<Booking[]>;
+  singleBooking(artistId: string,clientId: string): Promise<Booking|null>;
+  deleteBooking(bookingId: string): Promise<void>
 }
 
 export default IBookingRepository;

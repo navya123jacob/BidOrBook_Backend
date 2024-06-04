@@ -6,4 +6,6 @@ export interface IBookingUseCase {
     getBookingsreq(artistId: string, len: boolean): Promise<{ length: number } | { bookings: Booking[] }>;
     getBookingsConfirm(artistId: string, len: boolean): Promise<{ length: number } | { bookings: Booking[] }>;
     getMarked(artistId: string, len: boolean): Promise<{ length: number } | { bookings: Booking[] }>;
+    singleBooking(artistId: string,clientId: string): Promise<Booking|null>;
+    cancelBooking(bookingId: string, userId: string): Promise<void>
 }

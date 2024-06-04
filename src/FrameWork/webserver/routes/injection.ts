@@ -51,7 +51,7 @@ const postUseCase: PostUseCase = new PostUseCase(postRepository);
 const userController: IUserController = new UserController(userUseCase, nodemailerUtils, generateOTP);
 const bookingController: IBookingController = new BookingController(bookingUseCase, userUseCase);
 const messageController: IMessageController = new MessageController(messageUseCase);
-const postController: IPostController = new PostController(userUseCase, postUseCase); // Pass postUseCase here
+const postController: IPostController = new PostController(userUseCase, postUseCase); 
 
 // Export dependencies
 export {
