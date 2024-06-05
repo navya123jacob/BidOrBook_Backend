@@ -1,5 +1,5 @@
 import BookingModel from '../database/bookingModel';
-import { Booking } from '../../Domain/Booking';
+import { Booking, Location } from '../../Domain/Booking';
 import IBookingRepository from '../../use_case/interface/RepositoryInterface/IbookingRepo';
 
 export class BookingRepository implements IBookingRepository {
@@ -18,21 +18,25 @@ export class BookingRepository implements IBookingRepository {
     }
   }
 
-  async createBooking(artistId: string, clientId: string, dates: Date[], marked: boolean): Promise<Booking> {
+  async createBooking(artistId: string, clientId: string, dates: Date[], marked: boolean,event:string,location:Location): Promise<Booking> {
     let booking;
     if (marked) {
       booking = await BookingModel.create({
         artistId,
         clientId,
         date_of_booking: dates,
-        status: 'marked'
+        status: 'marked',
+        event,
+        location
       });
     } else {
       booking = await BookingModel.create({
         artistId,
         clientId,
         date_of_booking: dates,
-        status: 'pending'
+        status: 'pending',
+        event,
+        location
       });
     }
     const populatedBooking = await BookingModel.findById(booking._id).populate('clientId').exec();
@@ -41,7 +45,11 @@ export class BookingRepository implements IBookingRepository {
 
   async getBookingsByArtistId(artistId: string): Promise<Booking[]> {
     try {
-      const bookings = await BookingModel.find({ artistId, status: 'pending' }).populate('clientId').exec();
+      const bookings = await BookingModel.find({
+        artistId,
+        status: { $in: ['pending', 'confirmed'] }
+      }).populate('clientId').exec();
+      
       return bookings;
     } catch (error) {
       console.error('Error getting bookings by artist ID:', error);
@@ -51,7 +59,7 @@ export class BookingRepository implements IBookingRepository {
 
   async getBookingsByArtistIdConfirm(artistId: string): Promise<Booking[]> {
     try {
-      const bookings = await BookingModel.find({ artistId, status: 'confirmed' }).populate('clientId').exec();
+      const bookings = await BookingModel.find({ artistId, status: 'booked' }).populate('clientId').exec();
       return bookings;
     } catch (error) {
       console.error('Error getting bookings by artist ID:', error);
@@ -88,7 +96,30 @@ export class BookingRepository implements IBookingRepository {
     }
   }
 
-  
+  async updateBooking(
+    _id: string,
+    event: string,
+    location: Location,
+    date_of_booking: Date[],
+    status: string
+  ): Promise<Booking> {
+    try {
+      const updatedBooking = await BookingModel.findByIdAndUpdate(
+        _id,
+        { event, location, date_of_booking, status },
+        { new: true }
+      ).populate('clientId').exec();
+
+      if (!updatedBooking) {
+        throw new Error('Booking not found');
+      }
+
+      return updatedBooking as Booking;
+    } catch (error) {
+      console.error('Error updating booking:', error);
+      throw new Error('Failed to update booking');
+    }
+  }
 }
 
 export default BookingRepository;

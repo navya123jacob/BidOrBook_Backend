@@ -1,6 +1,6 @@
 import IBookingRepository from "./interface/RepositoryInterface/IbookingRepo";
 import { IBookingUseCase } from "./interface/useCaseInterface/IBookingUseCase";
-import { Booking } from "../Domain/Booking";
+import { Booking, Location } from "../Domain/Booking";
 
 export class BookingUseCase implements IBookingUseCase {
     constructor(private bookingRepository: IBookingRepository,
@@ -12,8 +12,8 @@ export class BookingUseCase implements IBookingUseCase {
         return bookings;
     }
 
-    async makeBooking(artistId: string, clientId: string, dates: Date[], marked: boolean): Promise<Booking> {
-        const booking = await this.bookingRepository.createBooking(artistId, clientId, dates, marked);
+    async makeBooking(artistId: string, clientId: string, dates: Date[], marked: boolean,event:string,location:Location): Promise<Booking> {
+        const booking = await this.bookingRepository.createBooking(artistId, clientId, dates, marked,event,location);
         return booking;
     }
 
@@ -53,4 +53,9 @@ export class BookingUseCase implements IBookingUseCase {
         await this.bookingRepository.deleteBooking(bookingId);
        
       }
+
+      async updateBooking(_id: string,event: string, location: Location,date_of_booking: Date[],status: string): Promise<Booking> {
+        return this.bookingRepository.updateBooking(_id, event, location, date_of_booking, status);
+    }
+
 }

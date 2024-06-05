@@ -23,9 +23,9 @@ export class BookingController implements BookingControllerInterface {
 
   async makeBookingreq(req: Request, res: Response): Promise<void> {
     try {
-      let { artistId, clientId, dates, marked } = req.body;
+      let { artistId, clientId, dates, marked,event,location} = req.body;
       
-      const booking = await this.bookingUseCase.makeBooking(artistId, clientId, dates, marked);
+      const booking = await this.bookingUseCase.makeBooking(artistId, clientId, dates, marked,event,location);
       const bookingId = booking._id
 
       await this.userUseCase.addBookingIdToUser(artistId, bookingId);
@@ -87,7 +87,8 @@ export class BookingController implements BookingControllerInterface {
 
         if (booking === null) {
             
-            res.status(404).json({ message: 'Booking not found' });
+          res.status(200).json(null);
+
         } else {
            
             res.status(200).json(booking);
@@ -114,5 +115,27 @@ async cancelBooking(req: Request, res: Response): Promise<void> {
   }
 }
 
+async updateBooking(req: Request, res: Response): Promise<void> {
+  try {
+    const { _id, event, location, date_of_booking } = req.body;
 
+    if (!_id || !event || !location || !date_of_booking) {
+      res.status(400).json({ message: 'Missing required fields' });
+      return;
+    }
+
+    const updatedBooking = await this.bookingUseCase.updateBooking(
+      _id,
+      event,
+      location,
+      date_of_booking,
+      'confirmed'
+    );
+
+    res.status(200).json(updatedBooking);
+  } catch (error) {
+    console.error('Error updating booking:', error);
+    res.status(500).json({ message: 'Failed to update booking' });
+  }
+}
 }
