@@ -9,4 +9,5 @@ export interface IBookingUseCase {
     singleBooking(artistId: string,clientId: string): Promise<Booking|null>;
     cancelBooking(bookingId: string, userId: string): Promise<void>;
     updateBooking(_id: string,event: string, location: Location,date_of_booking: Date[],status: string): Promise<Booking>;
+    cancelPaymentReq(_id: string): Promise<Booking>;
 }

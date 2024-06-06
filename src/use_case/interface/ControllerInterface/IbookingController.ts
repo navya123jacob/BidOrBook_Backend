@@ -8,7 +8,8 @@ interface BookingControllerInterface {
   getMarked(req: Request, res: Response): Promise<void>;
   getSingleBooking(req: Request, res: Response): Promise<void>;
   cancelBooking(req: Request, res: Response): Promise<void>;
-  updateBooking(req: Request, res: Response): Promise<void>
+  updateBooking(req: Request, res: Response): Promise<void>;
+  cancelPaymentReq(req: Request, res: Response): Promise<void>
 }
 
 export default BookingControllerInterface;

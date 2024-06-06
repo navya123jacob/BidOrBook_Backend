@@ -138,4 +138,23 @@ async updateBooking(req: Request, res: Response): Promise<void> {
     res.status(500).json({ message: 'Failed to update booking' });
   }
 }
+async cancelPaymentReq(req: Request, res: Response): Promise<void> {
+  try {
+    const { _id } = req.body;
+
+    if (!_id ) {
+      res.status(400).json({ message: 'Missing required fields' });
+      return;
+    }
+
+    const updatedBooking = await this.bookingUseCase.cancelPaymentReq(
+      _id
+    );
+
+    res.status(200).json(updatedBooking);
+  } catch (error) {
+    console.error('Error updating booking:', error);
+    res.status(500).json({ message: 'Failed to update booking' });
+  }
+}
 }

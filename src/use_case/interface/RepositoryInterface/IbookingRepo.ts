@@ -9,6 +9,7 @@ interface IBookingRepository {
   singleBooking(artistId: string,clientId: string): Promise<Booking|null>;
   deleteBooking(bookingId: string): Promise<void>;
   updateBooking( _id: string,event: string,location: Location,date_of_booking: Date[],status: string): Promise<Booking>;
+  cancelPaymentReq(_id: string): Promise<Booking>;
 }
 
 export default IBookingRepository;

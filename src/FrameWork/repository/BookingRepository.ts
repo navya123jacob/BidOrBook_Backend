@@ -120,6 +120,25 @@ export class BookingRepository implements IBookingRepository {
       throw new Error('Failed to update booking');
     }
   }
+
+  async cancelPaymentReq(_id: string): Promise<Booking> {
+    try {
+      const updatedBooking = await BookingModel.findByIdAndUpdate(
+        _id,
+        {  status:'pending' },
+        { new: true }
+      ).populate('clientId').exec();
+
+      if (!updatedBooking) {
+        throw new Error('Booking not found');
+      }
+
+      return updatedBooking as Booking;
+    } catch (error) {
+      console.error('Error updating booking:', error);
+      throw new Error('Failed to update booking');
+    }
+  }
 }
 
 export default BookingRepository;

@@ -57,5 +57,8 @@ export class BookingUseCase implements IBookingUseCase {
       async updateBooking(_id: string,event: string, location: Location,date_of_booking: Date[],status: string): Promise<Booking> {
         return this.bookingRepository.updateBooking(_id, event, location, date_of_booking, status);
     }
+      async cancelPaymentReq(_id: string): Promise<Booking> {
+        return this.bookingRepository.cancelPaymentReq(_id);
+    }
 
 }
