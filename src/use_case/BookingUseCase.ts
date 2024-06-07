@@ -54,11 +54,22 @@ export class BookingUseCase implements IBookingUseCase {
        
       }
 
-      async updateBooking(_id: string,event: string, location: Location,date_of_booking: Date[],status: string): Promise<Booking> {
-        return this.bookingRepository.updateBooking(_id, event, location, date_of_booking, status);
+      async updateBooking(_id: string,event: string, location: Location,date_of_booking: Date[],status: string,amount:number): Promise<Booking> {
+        return this.bookingRepository.updateBooking(_id, event, location, date_of_booking, status,amount);
     }
       async cancelPaymentReq(_id: string): Promise<Booking> {
         return this.bookingRepository.cancelPaymentReq(_id);
     }
+
+
+    async handleSuccessfulPayment(bookingId: string): Promise<void> {
+        const booking = await this.bookingRepository.findBySessionId(bookingId);
+        if (!booking) {
+          throw new Error('Booking not found for the given session ID');
+        }
+    
+        booking.status = 'booked'; 
+        await this.bookingRepository.updateBookingStripe(booking);
+      }
 
 }

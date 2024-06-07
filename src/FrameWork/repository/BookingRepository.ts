@@ -101,12 +101,13 @@ export class BookingRepository implements IBookingRepository {
     event: string,
     location: Location,
     date_of_booking: Date[],
-    status: string
+    status: string,
+    amount:number
   ): Promise<Booking> {
     try {
       const updatedBooking = await BookingModel.findByIdAndUpdate(
         _id,
-        { event, location, date_of_booking, status },
+        { event, location, date_of_booking, status,amount },
         { new: true }
       ).populate('clientId').exec();
 
@@ -125,7 +126,7 @@ export class BookingRepository implements IBookingRepository {
     try {
       const updatedBooking = await BookingModel.findByIdAndUpdate(
         _id,
-        {  status:'pending' },
+        {  status:'pending',amount:0 },
         { new: true }
       ).populate('clientId').exec();
 
@@ -138,6 +139,19 @@ export class BookingRepository implements IBookingRepository {
       console.error('Error updating booking:', error);
       throw new Error('Failed to update booking');
     }
+  }
+
+  async findBySessionId(bookingId: string): Promise<Booking | null> {
+    return BookingModel.findOne({ _id: bookingId }).exec();
+  }
+
+  async updateBookingStripe(booking: Booking): Promise<Booking> {
+    console.log(booking)
+    const updatedBooking = await BookingModel.findByIdAndUpdate(booking._id, booking, { new: true }).exec();
+    if (!updatedBooking) {
+      throw new Error('Booking not found');
+    }
+    return updatedBooking;
   }
 }
 

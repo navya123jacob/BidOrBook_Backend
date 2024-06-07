@@ -4,11 +4,17 @@ import { IBookingUseCase } from '../use_case/interface/useCaseInterface/IBooking
 import { Types } from 'mongoose';
 import { Booking } from '../Domain/Booking';
 import BookingControllerInterface from '../use_case/interface/ControllerInterface/IbookingController';
+import Stripe from 'stripe';
+
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
+const stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' });
+
 
 export class BookingController implements BookingControllerInterface {
   constructor(
     private bookingUseCase: IBookingUseCase,
-    private userUseCase: IUserUseCase
+    private userUseCase: IUserUseCase,
+    private stripe: Stripe
   ) {}
 
   async checkAvailability(req: Request, res: Response): Promise<void> {
@@ -117,9 +123,9 @@ async cancelBooking(req: Request, res: Response): Promise<void> {
 
 async updateBooking(req: Request, res: Response): Promise<void> {
   try {
-    const { _id, event, location, date_of_booking } = req.body;
+    const { _id, event, location, date_of_booking,amount } = req.body;
 
-    if (!_id || !event || !location || !date_of_booking) {
+    if (!_id || !event || !location || !date_of_booking ||!amount) {
       res.status(400).json({ message: 'Missing required fields' });
       return;
     }
@@ -129,7 +135,8 @@ async updateBooking(req: Request, res: Response): Promise<void> {
       event,
       location,
       date_of_booking,
-      'confirmed'
+      'confirmed',
+      amount
     );
 
     res.status(200).json(updatedBooking);
@@ -157,4 +164,77 @@ async cancelPaymentReq(req: Request, res: Response): Promise<void> {
     res.status(500).json({ message: 'Failed to update booking' });
   }
 }
+async createCheckoutSession(req: Request, res: Response): Promise<void> {
+  try {
+    const { bookingId, amount, artistId, clientId } = req.body;
+
+    
+    const successUrl = `http://localhost:5173/artprof/client?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `http://localhost:5173/artprof/client?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
+
+    const session = await this.stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: `Booking ID: ${bookingId.toString()}`,
+            },
+            unit_amount: amount * 100,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        bookingId: bookingId? bookingId.toString() : '',
+      },
+    });
+
+    res.json({ id: session.id, url: session.url });
+  } catch (error) {
+    console.error('Error creating Stripe checkout session:', error);
+    res.status(500).json({ message: 'Failed to create checkout session' });
+  }
 }
+
+
+
+async handleWebhook(req: Request, res: Response): Promise<void> {
+  
+  const sig = req.headers['stripe-signature'] as string;
+  let event;
+
+  try {
+    event = this.stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET as string
+    );
+  } catch (err) {
+    console.error(`Webhook Error: ${(err as Error).message}`);
+    res.status(400).send(`Webhook Error: ${(err as Error).message}`);
+    return;
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as any;
+    const metadata = session.metadata 
+
+    const { bookingId } = metadata;
+
+    console.log('Payment successful for Booking ID:', bookingId);
+  
+    await this.bookingUseCase.handleSuccessfulPayment(bookingId);
+  }
+
+  res.json({ received: true });
+}
+}
+
+
+
+

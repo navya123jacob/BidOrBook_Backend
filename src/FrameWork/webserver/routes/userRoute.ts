@@ -1,7 +1,8 @@
 import express from "express";
-import { userController, postController, bookingController, messageController }  from "./injection";
+import { userController, postController, bookingController, messageController  } from "./injection"; 
 import { protect } from "../../middlewares/userAuth";
 import upload from "../../utils/Multer";
+
 // Initialize router
 const router = express.Router();
 
@@ -31,9 +32,13 @@ router.post('/bookingsreq', protect, (req, res) => bookingController.getBookings
 router.post('/bookingsConfirmed', protect, (req, res) => bookingController.getBookingsConfirm(req, res));
 router.post('/marked', protect, (req, res) => bookingController.getMarked(req, res));
 router.get('/bookings/:artistId/:clientId', (req, res) => bookingController.getSingleBooking(req, res));
-router.post('/cancel-booking', bookingController.cancelBooking.bind(bookingController));
-router.put('/update-booking', (req, res) => bookingController.updateBooking(req, res))
-router.delete('/cancelPaymentReq', (req, res) => bookingController.cancelPaymentReq(req, res))
+router.post('/cancel-booking', protect, (req, res) => bookingController.cancelBooking(req, res));
+router.put('/update-booking', protect, (req, res) => bookingController.updateBooking(req, res));
+router.delete('/cancelPaymentReq', protect, (req, res) => bookingController.cancelPaymentReq(req, res));
+
+// Stripe routes
+router.post('/create-checkout-session', protect, (req, res) => bookingController.createCheckoutSession(req, res));
+
 
 // Messaging routes
 router.post('/sendMessage', protect, (req, res) => messageController.sendMessage(req, res));

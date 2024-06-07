@@ -32,7 +32,8 @@ const userSchema: Schema<User & Document> = new mongoose.Schema({
     },
     is_blocked: { type: Boolean, default: false },
     description: { type: String, default: "" },
-    refreshToken: { type: String, default: "" }
+    refreshToken: { type: String, default: "" },
+    wallet:{type:Number,default:0}
   
 });
 

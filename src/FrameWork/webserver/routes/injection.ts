@@ -28,6 +28,7 @@ import MessageController from "../../../adapter/ConvController";
 import PostController from "../../../adapter/postController";
 import PostRepository from "../../repository/postRepository";
 import PostUseCase from "../../../use_case/postUseCase";
+import Stripe from 'stripe';
 
 // Initialize utilities
 const encrypt: IEncrypt = new Encrypt();
@@ -47,11 +48,15 @@ const bookingUseCase: BookingUseCase = new BookingUseCase(bookingRepository);
 const messageUseCase: MessageUseCase = new MessageUseCase(messageRepository);
 const postUseCase: PostUseCase = new PostUseCase(postRepository);
 
+// Initialize Stripe
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
+const stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' });
+
 // Initialize controllers
 const userController: IUserController = new UserController(userUseCase, nodemailerUtils, generateOTP);
-const bookingController: IBookingController = new BookingController(bookingUseCase, userUseCase);
+const bookingController: IBookingController = new BookingController(bookingUseCase, userUseCase, stripe);
 const messageController: IMessageController = new MessageController(messageUseCase);
-const postController: IPostController = new PostController(userUseCase, postUseCase); 
+const postController: IPostController = new PostController(userUseCase, postUseCase);
 
 // Export dependencies
 export {

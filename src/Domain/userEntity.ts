@@ -30,5 +30,6 @@ export interface User {
     profile: string;
     description: string;
     refreshToken?: string;  
+    wallet:number
     
 }

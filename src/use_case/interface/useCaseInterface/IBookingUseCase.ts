@@ -8,6 +8,7 @@ export interface IBookingUseCase {
     getMarked(artistId: string, len: boolean): Promise<{ length: number } | { bookings: Booking[] }>;
     singleBooking(artistId: string,clientId: string): Promise<Booking|null>;
     cancelBooking(bookingId: string, userId: string): Promise<void>;
-    updateBooking(_id: string,event: string, location: Location,date_of_booking: Date[],status: string): Promise<Booking>;
+    updateBooking(_id: string,event: string, location: Location,date_of_booking: Date[],status: string,amount:number): Promise<Booking>;
     cancelPaymentReq(_id: string): Promise<Booking>;
+    handleSuccessfulPayment(sessionId: string): Promise<void>
 }

@@ -9,7 +9,9 @@ interface BookingControllerInterface {
   getSingleBooking(req: Request, res: Response): Promise<void>;
   cancelBooking(req: Request, res: Response): Promise<void>;
   updateBooking(req: Request, res: Response): Promise<void>;
-  cancelPaymentReq(req: Request, res: Response): Promise<void>
+  cancelPaymentReq(req: Request, res: Response): Promise<void>;
+  handleWebhook(req: Request, res: Response): Promise<void>;
+  createCheckoutSession(req: Request, res: Response): Promise<void>;
 }
 
 export default BookingControllerInterface;

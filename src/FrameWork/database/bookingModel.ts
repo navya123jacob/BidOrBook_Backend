@@ -13,7 +13,8 @@ const bookingSchema = new Schema<Booking>({
   event: { type: String},
   payment_method: { type: String },
   payment_date: { type: Date },
-  date_of_booking: { type: [Date] } 
+  date_of_booking: { type: [Date] } ,
+  amount:{ type: Number }
 });
 
 const BookingModel = model<Booking>('Booking', bookingSchema);
