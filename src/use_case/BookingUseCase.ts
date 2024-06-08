@@ -7,8 +7,8 @@ export class BookingUseCase implements IBookingUseCase {
       
     ) {}
 
-    async checkdate(artistId: string, startDate: Date, endDate: Date): Promise<Date[]> {
-        const bookings = await this.bookingRepository.findByArtistIdAndDateRange(artistId, startDate, endDate);
+    async checkdate(artistId: string, startDate: Date, endDate: Date,bookingId:string): Promise<Date[]> {
+        const bookings = await this.bookingRepository.findByArtistIdAndDateRange(artistId, startDate, endDate,bookingId);
         return bookings;
     }
 
@@ -70,6 +70,9 @@ export class BookingUseCase implements IBookingUseCase {
     
         booking.status = 'booked'; 
         await this.bookingRepository.updateBookingStripe(booking);
+      }
+      async updateBookingStatus(bookingId: string, status: string): Promise<Booking> {
+        return this.bookingRepository.updateBookingStatus(bookingId, status);
       }
 
 }

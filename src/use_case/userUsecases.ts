@@ -194,6 +194,9 @@ async saveRefreshToken(id: string | undefined, refreshToken: string | undefined)
 async updateUser(id: string, updateData: Partial<User>): Promise<User | null> {
   return this.userRepository.updateUser(id, updateData);
 }
+async updateWallet(id: string, amount: number): Promise<User | null> {
+  return this.userRepository.updateWallet(id,amount);
+}
 
 async addPostToUser(userId: string, postId: Types.ObjectId): Promise<{ status: number; message: string }> {
   try {
@@ -256,6 +259,17 @@ async addBookingIdToUser(artistId: string, bookingId: Types.ObjectId): Promise<{
 
 async removeBookingIdFromUser(userId: string, bookingId: string): Promise<void> {
   await this.userRepository.pullBookingId(userId, bookingId);
+}
+async deductFromWallet(userId: string, amount: number): Promise<User | null> {
+  const user = await this.userRepository.findById(userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+  if (user.wallet < amount) {
+    return null; 
+  }
+  const newBalance = user.wallet - amount;
+  return this.userRepository.updateWallet(userId, newBalance);
 }
 
 }

@@ -57,7 +57,7 @@ class UserController implements IUserController {
   async resetPass1(req: Request, res: Response): Promise<void> {
     try {
       const user = await this.userCase.resetPass1(req.body.email);
-      console.log(user);
+      
       if (user.data.state === true && user?.data?.data && user.data.data.is_google === true) {
         const data = {
           state: false,

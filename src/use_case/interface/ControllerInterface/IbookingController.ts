@@ -12,6 +12,7 @@ interface BookingControllerInterface {
   cancelPaymentReq(req: Request, res: Response): Promise<void>;
   handleWebhook(req: Request, res: Response): Promise<void>;
   createCheckoutSession(req: Request, res: Response): Promise<void>;
+  walletPayment(req: Request, res: Response): Promise<void>
 }
 
 export default BookingControllerInterface;

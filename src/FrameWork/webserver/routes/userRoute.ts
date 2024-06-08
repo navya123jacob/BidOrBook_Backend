@@ -35,6 +35,7 @@ router.get('/bookings/:artistId/:clientId', (req, res) => bookingController.getS
 router.post('/cancel-booking', protect, (req, res) => bookingController.cancelBooking(req, res));
 router.put('/update-booking', protect, (req, res) => bookingController.updateBooking(req, res));
 router.delete('/cancelPaymentReq', protect, (req, res) => bookingController.cancelPaymentReq(req, res));
+router.post('/wallet-payment', protect, (req, res) => bookingController.walletPayment(req, res));
 
 // Stripe routes
 router.post('/create-checkout-session', protect, (req, res) => bookingController.createCheckoutSession(req, res));

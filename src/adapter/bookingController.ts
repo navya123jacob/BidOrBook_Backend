@@ -19,8 +19,8 @@ export class BookingController implements BookingControllerInterface {
 
   async checkAvailability(req: Request, res: Response): Promise<void> {
     try {
-      const { artistId, startDate, endDate } = req.body;
-      const result = await this.bookingUseCase.checkdate(artistId, startDate, endDate);
+      const { artistId, startDate, endDate,bookingId } = req.body;
+      const result = await this.bookingUseCase.checkdate(artistId, startDate, endDate,bookingId);
       res.json(result);
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' });
@@ -107,14 +107,18 @@ export class BookingController implements BookingControllerInterface {
 
 async cancelBooking(req: Request, res: Response): Promise<void> {
   try {
-    const { bookingId, userId } = req.body;
+    const { bookingId, userId,clientId,amount,status } = req.body;
     if (!bookingId || !userId) {
       res.status(400).json({ message: 'bookingId and userId are required' });
       return;
     }
-
+ 
     await this.bookingUseCase.cancelBooking(bookingId, userId);
     await this.userUseCase.removeBookingIdFromUser(userId, bookingId);
+    
+    if(clientId && status=='booked'){
+      await this.userUseCase.updateWallet(clientId,amount);
+    }
     res.status(200).json({ message: 'Booking cancelled successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Internal server error: ' + (error as Error).message });
@@ -233,6 +237,30 @@ async handleWebhook(req: Request, res: Response): Promise<void> {
 
   res.json({ received: true });
 }
+
+async walletPayment(req: Request, res: Response): Promise<void> {
+  try {
+    const { bookingId, amount, clientId } = req.body;
+    
+    if (!bookingId || !amount || !clientId) {
+      res.status(400).json({ message: 'Missing required fields' });
+      return;
+    }
+    
+    const updatedWallet = await this.userUseCase.deductFromWallet(clientId, amount);
+    if (!updatedWallet) {
+      res.status(400).json({ message: 'Insufficient funds in wallet' });
+      return;
+    }
+    
+    const updatedBooking = await this.bookingUseCase.updateBookingStatus(bookingId, 'booked');
+    res.status(200).json({ message: 'Payment successful and booking updated', updatedBooking });
+  } catch (error) {
+    console.error('Error processing wallet payment:', error);
+    res.status(500).json({ message: 'Failed to process wallet payment' });
+  }
+}
+
 }
 
 

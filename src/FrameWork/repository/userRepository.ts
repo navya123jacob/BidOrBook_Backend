@@ -64,6 +64,14 @@ async findOneAndUpdate(_id: Types.ObjectId | string, update: Partial<User>): Pro
   async updateUser(id: string, userData: Partial<User>) {
     return await UserModel.findByIdAndUpdate(id, userData, { new: true });
   }
+  async updateWallet(id: string, amount: number): Promise<User | null> {
+    return await UserModel.findOneAndUpdate(
+        { _id:id },
+        { $set: { wallet:amount } },
+        { new: true }
+    ).exec();
+}
+
 
   async getAllPosts(filters: { userid?: string; category?: string; usernotid?: string;searchPlaceholder?: string}): Promise<any> {
     try {

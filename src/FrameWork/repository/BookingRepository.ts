@@ -3,12 +3,19 @@ import { Booking, Location } from '../../Domain/Booking';
 import IBookingRepository from '../../use_case/interface/RepositoryInterface/IbookingRepo';
 
 export class BookingRepository implements IBookingRepository {
-  async findByArtistIdAndDateRange(artistId: string, startDate: Date, endDate: Date): Promise<Date[]> {
+  async findByArtistIdAndDateRange(artistId: string, startDate: Date, endDate: Date, bookingId: string): Promise<Date[]> {
     try {
-      const bookings = await BookingModel.find({
+      const query: any = {
         artistId: artistId,
+        status: 'booked',
         date_of_booking: { $elemMatch: { $gte: startDate, $lte: endDate } }
-      }).exec();
+      };
+      
+      if (bookingId) {
+        query._id = { $ne: bookingId };
+      }
+      
+      const bookings = await BookingModel.find(query).exec();
       
       const datesOfBookings: Date[] = bookings.flatMap(booking => booking.date_of_booking);
       return datesOfBookings;
@@ -17,6 +24,7 @@ export class BookingRepository implements IBookingRepository {
       throw new Error('Failed to find bookings');
     }
   }
+  
 
   async createBooking(artistId: string, clientId: string, dates: Date[], marked: boolean,event:string,location:Location): Promise<Booking> {
     let booking;
@@ -27,7 +35,8 @@ export class BookingRepository implements IBookingRepository {
         date_of_booking: dates,
         status: 'marked',
         event,
-        location
+        location,
+        amount:0
       });
     } else {
       booking = await BookingModel.create({
@@ -36,7 +45,8 @@ export class BookingRepository implements IBookingRepository {
         date_of_booking: dates,
         status: 'pending',
         event,
-        location
+        location,
+        amount:0
       });
     }
     const populatedBooking = await BookingModel.findById(booking._id).populate('clientId').exec();
@@ -146,12 +156,30 @@ export class BookingRepository implements IBookingRepository {
   }
 
   async updateBookingStripe(booking: Booking): Promise<Booking> {
-    console.log(booking)
+   
     const updatedBooking = await BookingModel.findByIdAndUpdate(booking._id, booking, { new: true }).exec();
     if (!updatedBooking) {
       throw new Error('Booking not found');
     }
     return updatedBooking;
+  }
+  async updateBookingStatus(bookingId: string, status: string): Promise<Booking> {
+    try {
+      const updatedBooking = await BookingModel.findByIdAndUpdate(
+        bookingId,
+        { status },
+        { new: true }
+      ).exec();
+
+      if (!updatedBooking) {
+        throw new Error('Booking not found');
+      }
+
+      return updatedBooking as Booking;
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+      throw new Error('Failed to update booking status');
+    }
   }
 }
 
