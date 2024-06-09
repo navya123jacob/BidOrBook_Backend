@@ -16,7 +16,8 @@ interface IUserUseCase {
 addBookingIdToUser(artistId: string, bookingId: Types.ObjectId): Promise<{ status: number; data: { message: string } }>;
 removeBookingIdFromUser(userId: string, bookingId: string): Promise<void>;
 updateWallet(id: string, amount: number): Promise<User | null>;
-deductFromWallet(userId: string, amount: number): Promise<User | null>
+deductFromWallet(userId: string, amount: number): Promise<User | null>;
+updateWalletCancel(id: string, amount: number): Promise<User | null>
 }
 
 export default IUserUseCase;

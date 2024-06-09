@@ -197,6 +197,9 @@ async updateUser(id: string, updateData: Partial<User>): Promise<User | null> {
 async updateWallet(id: string, amount: number): Promise<User | null> {
   return this.userRepository.updateWallet(id,amount);
 }
+async updateWalletCancel(id: string, amount: number): Promise<User | null> {
+  return this.userRepository.updateWalletCancel(id,amount);
+}
 
 async addPostToUser(userId: string, postId: Types.ObjectId): Promise<{ status: number; message: string }> {
   try {

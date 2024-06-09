@@ -64,13 +64,31 @@ async findOneAndUpdate(_id: Types.ObjectId | string, update: Partial<User>): Pro
   async updateUser(id: string, userData: Partial<User>) {
     return await UserModel.findByIdAndUpdate(id, userData, { new: true });
   }
+
   async updateWallet(id: string, amount: number): Promise<User | null> {
+    
+
     return await UserModel.findOneAndUpdate(
-        { _id:id },
-        { $set: { wallet:amount } },
+        { _id: id },
+        { $set: { wallet: amount } },
         { new: true }
     ).exec();
 }
+  async updateWalletCancel(id: string, amount: number): Promise<User | null> {
+    const user = await UserModel.findById(id).exec();
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    const newWalletAmount = user.wallet + amount;
+
+    return await UserModel.findOneAndUpdate(
+        { _id: id },
+        { $set: { wallet: newWalletAmount } },
+        { new: true }
+    ).exec();
+}
+
 
 
   async getAllPosts(filters: { userid?: string; category?: string; usernotid?: string;searchPlaceholder?: string}): Promise<any> {

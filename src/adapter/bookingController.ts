@@ -117,7 +117,7 @@ async cancelBooking(req: Request, res: Response): Promise<void> {
     await this.userUseCase.removeBookingIdFromUser(userId, bookingId);
     
     if(clientId && status=='booked'){
-      await this.userUseCase.updateWallet(clientId,amount);
+      await this.userUseCase.updateWalletCancel(clientId,amount);
     }
     res.status(200).json({ message: 'Booking cancelled successfully' });
   } catch (error) {
