@@ -30,6 +30,13 @@ import PostRepository from "../../repository/postRepository";
 import PostUseCase from "../../../use_case/postUseCase";
 import Stripe from 'stripe';
 
+import IAuctionRepository from "../../../use_case/interface/RepositoryInterface/IAuctionRepo";
+import IAuctionUseCase from "../../../use_case/interface/useCaseInterface/IAuctionUseCase";
+import IAuctionController from "../../../use_case/interface/ControllerInterface/IauctionController";
+import AuctionRepository from "../../repository/AuctionRepository";
+import AuctionUseCase from "../../../use_case/auctionUseCase";
+import AuctionController from "../../../adapter/auctionController";
+
 // Initialize utilities
 const encrypt: IEncrypt = new Encrypt();
 const jwtPassword: IJWTPassword = new JWTPassword();
@@ -41,12 +48,14 @@ const userRepository: IUserRepository = new UserRepository(encrypt);
 const bookingRepository: IBookingRepository = new BookingRepository();
 const messageRepository: IMessageRepository = new MessageRepository();
 const postRepository: IPostRepository = new PostRepository();
+const auctionRepository: IAuctionRepository = new AuctionRepository();
 
 // Initialize use cases
 const userUseCase: UserUseCase = new UserUseCase(encrypt, userRepository, jwtPassword);
 const bookingUseCase: BookingUseCase = new BookingUseCase(bookingRepository);
 const messageUseCase: MessageUseCase = new MessageUseCase(messageRepository);
 const postUseCase: PostUseCase = new PostUseCase(postRepository);
+const auctionUseCase: IAuctionUseCase = new AuctionUseCase(auctionRepository);
 
 // Initialize Stripe
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
@@ -57,11 +66,13 @@ const userController: IUserController = new UserController(userUseCase, nodemail
 const bookingController: IBookingController = new BookingController(bookingUseCase, userUseCase, stripe);
 const messageController: IMessageController = new MessageController(messageUseCase);
 const postController: IPostController = new PostController(userUseCase, postUseCase);
+const auctionController: IAuctionController = new AuctionController(auctionUseCase);
 
 // Export dependencies
 export {
     userController,
     bookingController,
     messageController,
-    postController
+    postController,
+    auctionController
 };

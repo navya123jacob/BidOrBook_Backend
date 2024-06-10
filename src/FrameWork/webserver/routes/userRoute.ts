@@ -1,5 +1,5 @@
 import express from "express";
-import { userController, postController, bookingController, messageController  } from "./injection"; 
+import { userController, postController, bookingController, messageController, auctionController } from "./injection"; 
 import { protect } from "../../middlewares/userAuth";
 import upload from "../../utils/Multer";
 
@@ -44,5 +44,12 @@ router.post('/create-checkout-session', protect, (req, res) => bookingController
 // Messaging routes
 router.post('/sendMessage', protect, (req, res) => messageController.sendMessage(req, res));
 router.post('/getMessages', protect, (req, res) => messageController.getMessages(req, res));
+// Auction routes
+router.post('/createauction', protect, upload.single('image'), (req, res) => auctionController.createAuction(req, res));
+router.put('/update-auction-status', protect, (req, res) => auctionController.updateAuctionStatus(req, res));
+router.get('/auctions/user/:id', protect, (req, res) => auctionController.getAllAuctions(req, res));
+router.delete('/auctions/:id', protect, (req, res) => auctionController.deleteAuction(req, res));
+router.post('/place-bid', protect, (req, res) => auctionController.placeBid(req, res));
+router.post('/cancelBid',protect, (req, res) => auctionController.cancelBid(req, res));
 
 export default router;

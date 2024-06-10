@@ -4,6 +4,7 @@ import cors from 'cors';
 import path from "path";
 import userRoute from "../routes/userRoute";
 import { bookingController } from "../routes/injection";
+import '../../utils/updateAuctionStatus'
 
 const app: Express = express();
 

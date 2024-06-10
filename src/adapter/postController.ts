@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { Post } from '../Domain/postEntity';
 import IPostUseCase from '../use_case/interface/useCaseInterface/IPostUsecase';
 import IUserUseCase from '../use_case/interface/useCaseInterface/IUserUseCase';
 import { cloudinary } from '../FrameWork/utils/CloudinaryConfig';
