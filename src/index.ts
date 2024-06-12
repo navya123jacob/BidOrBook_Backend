@@ -1,14 +1,14 @@
 require('dotenv').config();
 import app from "./FrameWork/webserver/config/app";
 import connectDb from "./FrameWork/webserver/config/db";
-import { ServerSocket } from "./FrameWork/utils/Soket";
+import { initializeSocket } from "./FrameWork/utils/Soket";
 import http from 'http';
 
 const port = process.env.PORT || 3000; 
 const server = http.createServer(app);
 
 // Initialize Socket.IO server
-new ServerSocket(server);
+const io = initializeSocket(server);
 
 const start = async () => {
     try {
@@ -23,3 +23,6 @@ const start = async () => {
 };
 
 start();
+
+// Export the io instance
+export { io };

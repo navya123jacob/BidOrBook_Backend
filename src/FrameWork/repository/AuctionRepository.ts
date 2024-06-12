@@ -12,8 +12,19 @@ class AuctionRepository implements IAuctionRepo {
     const now = new Date();
     await AuctionModel.updateMany({ endingdate: { $lt: now }, status: 'active' }, { status: 'inactive' });
   }
-  async getAllAuctions(userId: string): Promise<any[]> {
-    return AuctionModel.find({ userId }).exec();
+  async getAllAuctions(userId: string,notId:string): Promise<any[]> {
+    interface Query {
+      userId?: string | { $ne: string };
+    }
+    
+    let query: Query = {};
+    
+    if (userId!='1') {
+      query.userId = userId;
+    }else {
+      query.userId = { $ne: notId };
+  }
+    return AuctionModel.find(query).exec();
   }
 
   async deleteAuction(auctionId: string): Promise<void> {

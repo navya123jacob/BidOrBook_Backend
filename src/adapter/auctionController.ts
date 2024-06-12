@@ -2,17 +2,22 @@ import { Request, Response } from 'express';
 import IAuctionUseCase from '../use_case/interface/useCaseInterface/IAuctionUseCase';
 import IAuctionController from '../use_case/interface/ControllerInterface/IauctionController';
 import { cloudinary } from '../FrameWork/utils/CloudinaryConfig';
+import { Server } from 'socket.io';
+import { io } from '..';
 class AuctionController implements IAuctionController {
   private auctionUseCase: IAuctionUseCase;
-
+ 
   constructor(auctionUseCase: IAuctionUseCase) {
     this.auctionUseCase = auctionUseCase;
+   
   }
+
 
   async createAuction(req: Request, res: Response): Promise<void> {
     try {
       
       const {name,description, userId, initial,  endingdate } = req.body;
+      
       const auctionData: any = {
         name,
         description,
@@ -52,12 +57,14 @@ class AuctionController implements IAuctionController {
   async getAllAuctions(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
-      const auctions = await this.auctionUseCase.getAllAuctions(userId);
+      const notId = req.query.notId as string || '';
+      const auctions = await this.auctionUseCase.getAllAuctions(userId,notId);
       res.status(200).json({ auctions });
     } catch (error) {
       res.status(500).json({ message: (error as Error).message });
     }
   }
+ 
 
   async deleteAuction(req: Request, res: Response): Promise<void> {
     try {
@@ -87,9 +94,9 @@ class AuctionController implements IAuctionController {
   async placeBid(req: Request, res: Response): Promise<void> {
     try {
       const { auctionId, amount, userId } = req.body;
-      
-      if (isNaN(amount) || amount <= 0) {
-        res.status(400).json({ error: 'Invalid bid amount' });
+
+      if (!auctionId || !userId || isNaN(amount) || amount <= 0) {
+        res.status(400).json({ error: 'Invalid input' });
         return;
       }
 
@@ -99,21 +106,24 @@ class AuctionController implements IAuctionController {
         return;
       }
 
-      if (auction.bids.length === 0 && amount <= auction.initial) {
-        res.status(400).json({ error: 'Bid amount must be greater than the initial bid' });
-        return;
-      } else if (auction.bids.length > 0 && amount <= auction.bids[auction.bids.length - 1].amount) {
-        res.status(400).json({ error: 'Bid amount must be greater than the last bid amount' });
+      const lastBidAmount = auction.bids.length > 0 ? auction.bids[auction.bids.length - 1].amount : auction.initial;
+      if (amount <= lastBidAmount) {
+        res.status(400).json({ error: `Bid amount must be greater than ${lastBidAmount}` });
         return;
       }
 
       const updatedAuction = await this.auctionUseCase.placeBid(auctionId, userId, amount);
+
+      io.to(`auction_${auctionId}`).emit('new_bid', { auctionId, userId, amount });
+
       res.status(200).json({ message: 'Bid placed successfully', auction: updatedAuction });
     } catch (error) {
       console.error('Error placing bid:', error);
       res.status(500).json({ error: 'Failed to place bid' });
     }
   }
+  
+  
   async cancelBid(req: Request, res: Response): Promise<void> {
     try {
       const { auctionId, userId } = req.body;

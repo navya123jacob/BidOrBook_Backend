@@ -29,7 +29,7 @@ import PostController from "../../../adapter/postController";
 import PostRepository from "../../repository/postRepository";
 import PostUseCase from "../../../use_case/postUseCase";
 import Stripe from 'stripe';
-
+import { io } from "../../..";
 import IAuctionRepository from "../../../use_case/interface/RepositoryInterface/IAuctionRepo";
 import IAuctionUseCase from "../../../use_case/interface/useCaseInterface/IAuctionUseCase";
 import IAuctionController from "../../../use_case/interface/ControllerInterface/IauctionController";

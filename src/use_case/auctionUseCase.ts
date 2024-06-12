@@ -16,8 +16,8 @@ class AuctionUseCase implements IAuctionUseCase {
   async updateAuctionStatus(): Promise<void> {
     await this.auctionRepo.updateStatusToInactive();
   }
-  async getAllAuctions(userId: string): Promise<any[]> {
-    return this.auctionRepo.getAllAuctions(userId);
+  async getAllAuctions(userId: string,notId:string): Promise<any[]> {
+    return this.auctionRepo.getAllAuctions(userId,notId);
   }
 
   async deleteAuction(auctionId: string): Promise<void> {

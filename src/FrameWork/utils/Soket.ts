@@ -2,11 +2,17 @@ import { Server as HttpServer } from 'http';
 import { Socket, Server } from 'socket.io';
 import { v4 } from 'uuid';
 
+interface Bid {
+    userId: string;
+    amount: number;
+}
+
 export class ServerSocket {
     public static instance: ServerSocket;
     public io: Server;
     public users: { [uid: string]: string };
     public rooms: { [roomId: string]: string[] };
+    public bids: { [roomId: string]: Bid } = {};
 
     constructor(server: HttpServer) {
         ServerSocket.instance = this;
@@ -26,12 +32,9 @@ export class ServerSocket {
     }
 
     StartListeners = (socket: Socket) => {
-        console.info('Message received from ' + socket.id);
-
         socket.on('handshake', ({ senderId, receiverId }, callback) => {
             console.info('Handshake received from: ' + socket.id);
 
-            // Verify if callback is a function
             if (typeof callback !== 'function') {
                 console.error('Callback is not a function');
                 return;
@@ -64,8 +67,13 @@ export class ServerSocket {
             this.SendMessage('user_connected', users.filter((id) => id !== socket.id), users);
         });
 
+        // Handle joining auction rooms
+        socket.on('join_auction', ({ auctionId }) => {
+            socket.join(`auction_${auctionId}`);
+            console.log(`User ${socket.id} joined auction room ${auctionId}`);
+        });
+
         socket.on('disconnect', () => {
-            console.info('Disconnect received from: ' + socket.id);
             const uid = this.GetUidFromSocketID(socket.id);
             if (uid) {
                 delete this.users[uid];
@@ -78,8 +86,13 @@ export class ServerSocket {
             console.info('Chat message received from ' + socket.id);
             const roomId = this.GetRoomIdFromUserIds(message.senderId, message.receiverId);
             if (roomId) {
-                this.SendMessageToRoom('chat_message', roomId, message);
+                this.sendMessageToRoom('chat_message', roomId, message);
             }
+        });
+
+        socket.on('place_bid', (bid: { userId: string; amount: number; roomId: string }, callback) => {
+            console.info('vavao ');
+            this.handlePlaceBid(socket, bid, callback);
         });
     };
 
@@ -109,11 +122,39 @@ export class ServerSocket {
         users.forEach((id) => (payload ? this.io.to(id).emit(name, payload) : this.io.to(id).emit(name)));
     };
 
-    SendMessageToRoom = (name: string, roomId: string, payload: Object) => {
+    sendMessageToRoom = (name: string, roomId: string, payload: object) => {
         this.io.to(roomId).emit(name, payload);
     };
 
     BroadcastMessage = (name: string, payload: Object) => {
         this.io.emit(name, payload);
     };
+
+    handlePlaceBid = (socket: Socket, bid: { userId: string; amount: number; roomId: string }, callback: Function): void => {
+        console.info(`Bid received from ${bid.userId} in room ${bid.roomId}`);
+    
+        if (!this.rooms[bid.roomId]) {
+            console.error('Invalid room ID');
+            callback({ success: false, message: 'Invalid room ID' });
+            return;
+        }
+    
+        const currentBid = this.bids[bid.roomId];
+        if (currentBid && bid.amount <= currentBid.amount) {
+            console.error('Bid amount too low');
+            callback({ success: false, message: 'Bid amount must be higher than the current highest bid' });
+            return;
+        }
+    
+        this.bids[bid.roomId] = { userId: bid.userId, amount: bid.amount };
+        this.sendMessageToRoom('new_bid', bid.roomId, { ...bid, auctionId: bid.roomId });
+        callback({ success: true, message: 'Bid placed successfully' });
+    };
+    
 }
+
+// Function to initialize and export the io instance
+export const initializeSocket = (server: HttpServer): Server => {
+    const socketServer = new ServerSocket(server);
+    return socketServer.io;
+};

@@ -47,7 +47,7 @@ router.post('/getMessages', protect, (req, res) => messageController.getMessages
 // Auction routes
 router.post('/createauction', protect, upload.single('image'), (req, res) => auctionController.createAuction(req, res));
 router.put('/update-auction-status', protect, (req, res) => auctionController.updateAuctionStatus(req, res));
-router.get('/auctions/user/:id', protect, (req, res) => auctionController.getAllAuctions(req, res));
+router.get('/auctions/user/:userId', protect, (req, res) => auctionController.getAllAuctions(req, res));
 router.delete('/auctions/:id', protect, (req, res) => auctionController.deleteAuction(req, res));
 router.post('/place-bid', protect, (req, res) => auctionController.placeBid(req, res));
 router.post('/cancelBid',protect, (req, res) => auctionController.cancelBid(req, res));
