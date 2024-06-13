@@ -17,7 +17,8 @@ addBookingIdToUser(artistId: string, bookingId: Types.ObjectId): Promise<{ statu
 removeBookingIdFromUser(userId: string, bookingId: string): Promise<void>;
 updateWallet(id: string, amount: number): Promise<User | null>;
 deductFromWallet(userId: string, amount: number): Promise<User | null>;
-updateWalletCancel(id: string, amount: number): Promise<User | null>
+updateWalletCancel(id: string, amount: number): Promise<User | null>;
+SingleUser(id: string): Promise<User | null>
 }
 
 export default IUserUseCase;

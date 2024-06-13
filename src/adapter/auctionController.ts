@@ -128,6 +128,9 @@ class AuctionController implements IAuctionController {
     try {
       const { auctionId, userId } = req.body;
       const updatedAuction = await this.auctionUseCase.cancelBid(auctionId, userId);
+
+      io.to(`auction_${auctionId}`).emit('cancel_bid', { auctionId, userId });
+
       res.status(200).json(updatedAuction);
     } catch (error) {
       res.status(500).json({ message: (error as Error).message });

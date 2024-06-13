@@ -194,6 +194,9 @@ async saveRefreshToken(id: string | undefined, refreshToken: string | undefined)
 async updateUser(id: string, updateData: Partial<User>): Promise<User | null> {
   return this.userRepository.updateUser(id, updateData);
 }
+async SingleUser(id: string): Promise<User | null> {
+  return this.userRepository.findById(id)
+}
 async updateWallet(id: string, amount: number): Promise<User | null> {
   return this.userRepository.updateWallet(id,amount);
 }

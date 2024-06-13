@@ -256,6 +256,20 @@ class UserController implements IUserController {
       res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
   }
+  async SingleUser(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      let user=await this.userCase.SingleUser(id)
+      if (!user) {
+        res.status(404).json({ success: false, message: 'User not found' });
+        return;
+      }
+      res.status(200).json({ success: true, user: user });
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+  }
 
   async getAllPosts(req: Request, res: Response): Promise<void> {
     try {

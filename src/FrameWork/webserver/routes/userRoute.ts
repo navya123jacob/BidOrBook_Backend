@@ -20,6 +20,7 @@ router.put('/clientprofile', protect, upload.single('image'), (req, res) => user
 router.post('/allpost', protect, (req, res) => userController.getAllPosts(req, res));
 router.post('/singleposts/:id', protect, (req, res) => userController.singleUserPost(req, res));
 router.get('/logout', protect, (req, res) => userController.logout(req, res));
+router.get('/SingleUser/:id', protect, (req, res) => userController.SingleUser(req, res));
 
 // Post routes
 router.post('/createpost', protect, upload.single('image'), (req, res) => postController.createPost(req, res));

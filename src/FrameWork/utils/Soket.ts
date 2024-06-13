@@ -73,6 +73,10 @@ export class ServerSocket {
             console.log(`User ${socket.id} joined auction room ${auctionId}`);
         });
 
+        socket.on('cancel_bid', ({ auctionId, userId }) => {
+            this.handleCancelBid(socket, auctionId, userId);
+        });
+
         socket.on('disconnect', () => {
             const uid = this.GetUidFromSocketID(socket.id);
             if (uid) {
@@ -149,6 +153,20 @@ export class ServerSocket {
         this.bids[bid.roomId] = { userId: bid.userId, amount: bid.amount };
         this.sendMessageToRoom('new_bid', bid.roomId, { ...bid, auctionId: bid.roomId });
         callback({ success: true, message: 'Bid placed successfully' });
+    };
+    handleCancelBid = (socket: Socket, auctionId: string, userId: string) => {
+        console.info(`Bid cancelled by user ${userId} in auction ${auctionId}`);
+        
+        if (!this.rooms[`auction_${auctionId}`]) {
+            console.error('Invalid auction ID');
+            return;
+        }
+
+        if (this.bids[`auction_${auctionId}`] && this.bids[`auction_${auctionId}`].userId === userId) {
+            delete this.bids[`auction_${auctionId}`];
+        }
+
+        this.sendMessageToRoom('cancel_bid', `auction_${auctionId}`, { auctionId, userId });
     };
     
 }

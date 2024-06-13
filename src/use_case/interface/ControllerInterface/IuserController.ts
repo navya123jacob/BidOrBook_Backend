@@ -13,6 +13,7 @@ interface IUserController {
   updateUser(req: Request, res: Response): Promise<void>;
   getAllPosts(req: Request, res: Response): Promise<void>;
   singleUserPost(req: Request, res: Response): Promise<void>;
+  SingleUser(req: Request, res: Response): Promise<void>
 }
 
 export default IUserController;
