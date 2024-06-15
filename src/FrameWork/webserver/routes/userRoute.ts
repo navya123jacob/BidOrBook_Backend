@@ -45,6 +45,8 @@ router.post('/create-checkout-session', protect, (req, res) => bookingController
 // Messaging routes
 router.post('/sendMessage', protect, (req, res) => messageController.sendMessage(req, res));
 router.post('/getMessages', protect, (req, res) => messageController.getMessages(req, res));
+router.get('/getUserChats/:userId',protect, (req, res) => messageController.getUserChats(req, res));
+
 // Auction routes
 router.post('/createauction', protect, upload.single('image'), (req, res) => auctionController.createAuction(req, res));
 router.put('/update-auction-status', protect, (req, res) => auctionController.updateAuctionStatus(req, res));

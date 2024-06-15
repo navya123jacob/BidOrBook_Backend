@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import IMessageUseCase from '../use_case/interface/useCaseInterface/IConvUsecase';
 import IMessageController from '../use_case/interface/ControllerInterface/IConvController';
-
+import { Types } from 'mongoose';
 class MessageController implements IMessageController {
     private messageUseCase: IMessageUseCase;
 
@@ -40,6 +40,17 @@ async sendMessage(req: Request, res: Response): Promise<void> {
             res.status(500).json({ message: 'Internal server error' });
         }
     }
+
+    async getUserChats(req: Request, res: Response): Promise<void> {
+        try {
+            const { userId } = req.params;
+            const chats = await this.messageUseCase.getUserChats(new Types.ObjectId(userId));
+            res.status(200).json(chats);
+        } catch (error) {
+            console.error('Error getting user chats:', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    }   
 }
 
 export default MessageController;
