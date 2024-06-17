@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import cors from 'cors';
 import path from "path";
 import userRoute from "../routes/userRoute";
+import adminRoute from "../routes/adminRoute"
 import { bookingController } from "../routes/injection";
 import '../../utils/updateAuctionStatus'
 
@@ -28,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.use('/', userRoute);
+app.use('/admin', adminRoute);
 
 // Fallback route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {

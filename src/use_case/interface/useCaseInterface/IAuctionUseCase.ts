@@ -1,4 +1,4 @@
-import { IAuction } from "../../../Domain/Auction";
+import { Address, IAuction } from "../../../Domain/Auction";
 
 export default interface IAuctionUseCase {
   createAuction(auctionData: IAuction): Promise<IAuction>;
@@ -7,5 +7,8 @@ export default interface IAuctionUseCase {
   deleteAuction(auctionId: string): Promise<void>;
   getAuctionById(auctionId: string): Promise<IAuction | null>;
   placeBid(auctionId: string, userId: string, amount: number): Promise<IAuction>;
-  cancelBid(auctionId: string, userId: string): Promise<IAuction>
+  cancelBid(auctionId: string, userId: string): Promise<IAuction>;
+  handleSuccessfulPayment(auctionId: string,address:Address): Promise<void>;
+  updateAuctionWallet(AuctionId: string,address:Address): Promise<IAuction>;
+  getAuctionsByBidder(clientId: string): Promise<IAuction[]>
 }

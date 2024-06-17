@@ -7,5 +7,8 @@ export default interface IAuctionController {
   deleteAuction(req: Request, res: Response): Promise<void>;
   placeBid(req: Request, res: Response): Promise<void>;
   cancelBid(req: Request, res: Response): Promise<void>;
+  createCheckoutSessionAuction(req: Request, res: Response): Promise<void>;
+  walletPaymentAuction(req: Request, res: Response): Promise<void>;
+  getAuctionsByBidder(req: Request, res: Response): Promise<void> 
 
 }

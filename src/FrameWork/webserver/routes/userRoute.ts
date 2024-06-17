@@ -37,9 +37,11 @@ router.post('/cancel-booking', protect, (req, res) => bookingController.cancelBo
 router.put('/update-booking', protect, (req, res) => bookingController.updateBooking(req, res));
 router.delete('/cancelPaymentReq', protect, (req, res) => bookingController.cancelPaymentReq(req, res));
 router.post('/wallet-payment', protect, (req, res) => bookingController.walletPayment(req, res));
+router.post('/find-available-people',protect, (req, res) => bookingController.findAvailablePeople(req, res));
 
 // Stripe routes
 router.post('/create-checkout-session', protect, (req, res) => bookingController.createCheckoutSession(req, res));
+router.post('/create-checkout-session-auction', protect, (req, res) => auctionController.createCheckoutSessionAuction(req, res));
 
 
 // Messaging routes
@@ -54,5 +56,7 @@ router.get('/auctions/user/:userId', protect, (req, res) => auctionController.ge
 router.delete('/auctions/:id', protect, (req, res) => auctionController.deleteAuction(req, res));
 router.post('/place-bid', protect, (req, res) => auctionController.placeBid(req, res));
 router.post('/cancelBid',protect, (req, res) => auctionController.cancelBid(req, res));
+router.post('/wallet-payment-auction', protect, (req, res) => auctionController.walletPaymentAuction(req, res));
+router.post('/auctions-by-bidder',protect,(req, res) => auctionController.getAuctionsByBidder(req, res));
 
 export default router;

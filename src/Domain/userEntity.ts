@@ -1,8 +1,7 @@
 import { Types } from "mongoose";
 
-export interface Address {
-    address: string;
-    pincode: number;
+export interface Location {
+    
     state: string;
     district: string;
     country: string;
@@ -14,7 +13,7 @@ export interface User {
     Fname: string;
     Lname: string;
     email: string;
-    addresses: Address[];
+    location: Location;
     phone: number;
     password: string;
     posts: Types.ObjectId[];

@@ -5,6 +5,7 @@ import { Types } from 'mongoose';
 import { Booking } from '../Domain/Booking';
 import BookingControllerInterface from '../use_case/interface/ControllerInterface/IbookingController';
 import Stripe from 'stripe';
+import IAuctionUseCase from '../use_case/interface/useCaseInterface/IAuctionUseCase';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
 const stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' });
@@ -14,7 +15,8 @@ export class BookingController implements BookingControllerInterface {
   constructor(
     private bookingUseCase: IBookingUseCase,
     private userUseCase: IUserUseCase,
-    private stripe: Stripe
+    private stripe: Stripe,
+    private auctionUseCase:IAuctionUseCase
   ) {}
 
   async checkAvailability(req: Request, res: Response): Promise<void> {
@@ -43,13 +45,13 @@ export class BookingController implements BookingControllerInterface {
 
   async getBookingsreq(req: Request, res: Response): Promise<void> {
     try {
-      const { artistId, len } = req.body;
-      if (!artistId) {
-        res.status(400).json({ message: 'artistId is required' });
-        return;
-      }
+      const { artistId,clientId, len } = req.body;
+      // if (!artistId) {
+      //   res.status(400).json({ message: 'artistId is required' });
+      //   return;
+      // }
 
-      const result = await this.bookingUseCase.getBookingsreq(artistId as string, len === 'true');
+      const result = await this.bookingUseCase.getBookingsreq(artistId as string, clientId as string);
       res.json(result);
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' });
@@ -58,13 +60,13 @@ export class BookingController implements BookingControllerInterface {
 
   async getBookingsConfirm(req: Request, res: Response): Promise<void> {
     try {
-      const { artistId, len } = req.body;
-      if (!artistId) {
-        res.status(400).json({ message: 'artistId is required' });
-        return;
-      }
+      const { artistId,clientId, len } = req.body;
+      // if (!artistId) {
+      //   res.status(400).json({ message: 'artistId is required' });
+      //   return;
+      // }
 
-      const result = await this.bookingUseCase.getBookingsConfirm(artistId as string, len === 'true');
+      const result = await this.bookingUseCase.getBookingsConfirm(artistId as string,clientId as string);
       res.json(result);
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' });
@@ -73,13 +75,13 @@ export class BookingController implements BookingControllerInterface {
 
   async getMarked(req: Request, res: Response): Promise<void> {
     try {
-      const { artistId, len } = req.body;
-      if (!artistId) {
-        res.status(400).json({ message: 'artistId is required' });
-        return;
-      }
+      const { artistId,clientId, len } = req.body;
+      // if (!artistId) {
+      //   res.status(400).json({ message: 'artistId is required' });
+      //   return;
+      // }
 
-      const result = await this.bookingUseCase.getMarked(artistId as string, len === 'true');
+      const result = await this.bookingUseCase.getMarked(artistId as string,clientId as string);
       res.json(result);
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' });
@@ -174,6 +176,7 @@ async createCheckoutSession(req: Request, res: Response): Promise<void> {
 
     
     const successUrl = `http://localhost:5173/artprof/client?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
+    
     const cancelUrl = `http://localhost:5173/artprof/client?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
 
     const session = await this.stripe.checkout.sessions.create({
@@ -194,7 +197,7 @@ async createCheckoutSession(req: Request, res: Response): Promise<void> {
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
-        bookingId: bookingId? bookingId.toString() : '',
+        bookingId: bookingId? bookingId.toString() : ''
       },
     });
 
@@ -204,6 +207,7 @@ async createCheckoutSession(req: Request, res: Response): Promise<void> {
     res.status(500).json({ message: 'Failed to create checkout session' });
   }
 }
+
 
 
 
@@ -228,11 +232,15 @@ async handleWebhook(req: Request, res: Response): Promise<void> {
     const session = event.data.object as any;
     const metadata = session.metadata 
 
-    const { bookingId } = metadata;
+    const { bookingId,auctionId,addressline,district,state,country,pincode,phonenumber } = metadata;
 
     console.log('Payment successful for Booking ID:', bookingId);
-  
-    await this.bookingUseCase.handleSuccessfulPayment(bookingId);
+    if(bookingId){
+    await this.bookingUseCase.handleSuccessfulPayment(bookingId);}
+    if(auctionId){
+      let address={addressline,district,state,country,pincode:parseInt(pincode),phonenumber:parseInt(phonenumber)}
+      await this.auctionUseCase.handleSuccessfulPayment(auctionId,address);
+    }
   }
 
   res.json({ received: true });
@@ -261,7 +269,26 @@ async walletPayment(req: Request, res: Response): Promise<void> {
   }
 }
 
+async findAvailablePeople(req: Request, res: Response): Promise<void> {
+  try {
+    const { startDate, endDate,category } = req.body;
+    if (!startDate || !endDate) {
+      res.status(400).json({ message: 'startDate and endDate are required' });
+      return;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const result = await this.bookingUseCase.findAvailablePeople(start, end,category);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error: ' + (error as Error).message });
+  }
 }
+
+}
+
 
 
 

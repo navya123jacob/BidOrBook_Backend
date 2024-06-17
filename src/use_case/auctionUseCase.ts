@@ -1,6 +1,6 @@
 import IAuctionUseCase from './interface/useCaseInterface/IAuctionUseCase';
 import IAuctionRepo from './interface/RepositoryInterface/IAuctionRepo';
-import { IAuction } from '../Domain/Auction';
+import { Address, IAuction } from '../Domain/Auction';
 
 class AuctionUseCase implements IAuctionUseCase {
   private auctionRepo: IAuctionRepo;
@@ -32,6 +32,23 @@ class AuctionUseCase implements IAuctionUseCase {
   }
   async cancelBid(auctionId: string, userId: string): Promise<IAuction> {
     return this.auctionRepo.cancelBid(auctionId, userId);
+  }
+  async handleSuccessfulPayment(auctionId: string,address:Address): Promise<void> {
+    const auction = await this.auctionRepo.findById(auctionId);
+    if (!auction) {
+      throw new Error('Auction not found ');
+    }
+
+    auction.payment = 'paid'; 
+    auction.paymentmethod='stripe'
+    auction.address=address
+    await this.auctionRepo.updateAuctionStripe(auction);
+  }
+  async updateAuctionWallet(AuctionId: string,address:Address): Promise<IAuction> {
+    return this.auctionRepo.updateAuctionWallet(AuctionId,address);
+  }
+  async getAuctionsByBidder(clientId: string): Promise<IAuction[]> {
+    return await this.auctionRepo.getAuctionsByBidder(clientId);
   }
 }
 

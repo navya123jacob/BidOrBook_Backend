@@ -1,6 +1,7 @@
 import IBookingRepository from "./interface/RepositoryInterface/IbookingRepo";
 import { IBookingUseCase } from "./interface/useCaseInterface/IBookingUseCase";
 import { Booking, Location } from "../Domain/Booking";
+import { User } from "../Domain/userEntity";
 
 export class BookingUseCase implements IBookingUseCase {
     constructor(private bookingRepository: IBookingRepository,
@@ -17,27 +18,23 @@ export class BookingUseCase implements IBookingUseCase {
         return booking;
     }
 
-    async getBookingsreq(artistId: string, len: boolean): Promise<{ length: number } | { bookings: Booking[] }> {
-        const bookings = await this.bookingRepository.getBookingsByArtistId(artistId);
-        if (len) {
-            return { length: bookings.length };
-        }
+    async getBookingsreq(artistId: string,clientId:string): Promise< { bookings: Booking[] }> {
+        const bookings = await this.bookingRepository.getBookingsByArtistId(artistId,clientId);
+        
         return { bookings };
     }
 
-    async getBookingsConfirm(artistId: string, len: boolean): Promise<{ length: number } | { bookings: Booking[] }> {
-        const bookings = await this.bookingRepository.getBookingsByArtistIdConfirm(artistId);
-        if (len) {
-            return { length: bookings.length };
-        }
+    async getBookingsConfirm(artistId: string,clientId:string): Promise< { bookings: Booking[] }> {
+        const bookings = await this.bookingRepository.getBookingsByArtistIdConfirm(artistId,clientId);
+       
         return { bookings };
     }
 
-    async getMarked(artistId: string, len: boolean): Promise<{ length: number } | { bookings: Booking[] }> {
-        const bookings = await this.bookingRepository.getBookingsByArtistIdMarked(artistId);
-        if (len) {
-            return { length: bookings.length };
-        }
+    async getMarked(artistId: string,clientId:string): Promise< { bookings: Booking[] }> {
+      let bookings
+      
+        bookings = await this.bookingRepository.getBookingsByArtistIdMarked(artistId,clientId)
+        
         return { bookings };
     }
 
@@ -69,10 +66,15 @@ export class BookingUseCase implements IBookingUseCase {
         }
     
         booking.status = 'booked'; 
+        booking.payment_method='stripe'
         await this.bookingRepository.updateBookingStripe(booking);
       }
       async updateBookingStatus(bookingId: string, status: string): Promise<Booking> {
         return this.bookingRepository.updateBookingStatus(bookingId, status);
+      }
+      async findAvailablePeople(startDate: Date, endDate: Date,category:string): Promise<User[]> {
+        const availablePeople = await this.bookingRepository.findAvailablePeopleByDateRange(startDate, endDate,category);
+        return availablePeople;
       }
 
 }

@@ -63,10 +63,10 @@ const stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' });
 
 // Initialize controllers
 const userController: IUserController = new UserController(userUseCase, nodemailerUtils, generateOTP);
-const bookingController: IBookingController = new BookingController(bookingUseCase, userUseCase, stripe);
+const bookingController: IBookingController = new BookingController(bookingUseCase, userUseCase, stripe,auctionUseCase);
 const messageController: IMessageController = new MessageController(messageUseCase);
 const postController: IPostController = new PostController(userUseCase, postUseCase);
-const auctionController: IAuctionController = new AuctionController(auctionUseCase);
+const auctionController: IAuctionController = new AuctionController(auctionUseCase, stripe,userUseCase);
 
 // Export dependencies
 export {

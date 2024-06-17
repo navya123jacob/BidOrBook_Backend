@@ -1,7 +1,8 @@
 import IAuctionRepo from '../../use_case/interface/RepositoryInterface/IAuctionRepo';
 import AuctionModel from '../database/auctionModel';
-import { IAuction } from '../../Domain/Auction';
-
+import { Address, IAuction } from '../../Domain/Auction';
+import PdfService from '../utils/Invoice'
+const pdfService = PdfService;
 class AuctionRepository implements IAuctionRepo {
   async create(auctionData: IAuction): Promise<IAuction> {
     const auction = new AuctionModel(auctionData);
@@ -15,16 +16,21 @@ class AuctionRepository implements IAuctionRepo {
   async getAllAuctions(userId: string,notId:string): Promise<any[]> {
     interface Query {
       userId?: string | { $ne: string };
+      status?:string
     }
     
     let query: Query = {};
     
     if (userId!='1') {
       query.userId = userId;
+      
     }else {
       query.userId = { $ne: notId };
+      query.status='active'
   }
-    return AuctionModel.find(query).exec();
+  return AuctionModel.find(query)
+  .sort({ endingDate: -1 }) 
+  .exec();
   }
 
   async deleteAuction(auctionId: string): Promise<void> {
@@ -66,6 +72,38 @@ class AuctionRepository implements IAuctionRepo {
 
     return auction;
   }
+  async updateAuctionStripe(auction:IAuction): Promise<IAuction> {
+   
+    const updatedAuction = await AuctionModel.findByIdAndUpdate(auction._id,auction, { new: true }).exec();
+    if (!updatedAuction) {
+      throw new Error('Booking not found');
+    }
+    return updatedAuction;
+  }
+
+  async updateAuctionWallet(auctionId: string,address:Address): Promise<IAuction> {
+    try {
+      const updatedAuction = await AuctionModel.findByIdAndUpdate(
+        auctionId,
+        { paymentmethod:'wallet',payment:'paid',address },
+        { new: true }
+      ).exec();
+
+      if (!updatedAuction) {
+        throw new Error('Auction not found');
+      }
+      
+      return updatedAuction as IAuction;
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+      throw new Error('Failed to update booking status');
+    }
+  }
+  async getAuctionsByBidder(clientId: string): Promise<IAuction[]> {
+    return AuctionModel.find({ 'bids.userId': clientId }).exec();
+  }
+  
+
 }
 
 export default AuctionRepository;

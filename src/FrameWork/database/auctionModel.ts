@@ -10,9 +10,19 @@ const auctionSchema = new Schema< IAuction>({
   bids: { 
     userId:{type: String}, amount:{type:Number}},
   startingdate: { type: Date, default: Date.now, required: true },
-  endingdate: { type: Date, required: true },
-  status: { type: String, enum: ['active', 'inactive'], default: 'active', required: true },
-  initial:{type:Number}
+  endingdate: { type: Date, index: true, required: true },
+  status: { type: String, enum: ['active', 'inactive'], default: 'active', required: true  },
+  initial:{type:Number},
+  paymentmethod: { type: String, enum: ['wallet', 'stripe',''] },
+  payment: { type: String, enum: ['pending', 'paid'], default: 'pending' },
+  address: {
+    addressline: { type: String },
+    district: { type: String },
+    state: { type: String },
+    country: { type: String },
+    pincode: { type: Number},
+    phonenumber: { type: Number},
+  },
 });
 
 

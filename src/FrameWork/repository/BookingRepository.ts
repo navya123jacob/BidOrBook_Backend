@@ -1,8 +1,10 @@
 import BookingModel from '../database/bookingModel';
 import { Booking, Location } from '../../Domain/Booking';
 import IBookingRepository from '../../use_case/interface/RepositoryInterface/IbookingRepo';
+import { User } from '../../Domain/userEntity';
+import { UserModel } from '../database/userModel';
 
-export class BookingRepository implements IBookingRepository {
+ class BookingRepository implements IBookingRepository {
   async findByArtistIdAndDateRange(artistId: string, startDate: Date, endDate: Date, bookingId: string): Promise<Date[]> {
     try {
       const query: any = {
@@ -36,7 +38,9 @@ export class BookingRepository implements IBookingRepository {
         status: 'marked',
         event,
         location,
-        amount:0
+        amount:0,
+        payment_method:'',
+        
       });
     } else {
       booking = await BookingModel.create({
@@ -46,19 +50,27 @@ export class BookingRepository implements IBookingRepository {
         status: 'pending',
         event,
         location,
-        amount:0
+        amount:0,
+        payment_method:'',
       });
     }
     const populatedBooking = await BookingModel.findById(booking._id).populate('clientId').exec();
     return populatedBooking as Booking;
   }
 
-  async getBookingsByArtistId(artistId: string): Promise<Booking[]> {
-    try {
-      const bookings = await BookingModel.find({
+  async getBookingsByArtistId(artistId: string,clientId:string): Promise<Booking[]> {
+    try {let bookings;
+      if(artistId){
+       bookings = await BookingModel.find({
         artistId,
         status: { $in: ['pending', 'confirmed'] }
-      }).populate('clientId').exec();
+      }).populate('clientId').exec();}
+      else{
+        bookings = await BookingModel.find({
+          clientId,
+          status: { $in: ['pending', 'confirmed'] }
+        }).populate('artistId').exec();
+      }
       
       return bookings;
     } catch (error) {
@@ -67,9 +79,12 @@ export class BookingRepository implements IBookingRepository {
     }
   }
 
-  async getBookingsByArtistIdConfirm(artistId: string): Promise<Booking[]> {
-    try {
-      const bookings = await BookingModel.find({ artistId, status: 'booked' }).populate('clientId').exec();
+  async getBookingsByArtistIdConfirm(artistId: string,clientId:string): Promise<Booking[]> {
+    try {let bookings;
+      if(artistId){
+       bookings = await BookingModel.find({ artistId, status: 'booked' }).populate('clientId').exec();}
+       else{
+        bookings = await BookingModel.find({ clientId, status: 'booked' }).populate('artistId').exec();}
       return bookings;
     } catch (error) {
       console.error('Error getting bookings by artist ID:', error);
@@ -77,9 +92,12 @@ export class BookingRepository implements IBookingRepository {
     }
   }
 
-  async getBookingsByArtistIdMarked(artistId: string): Promise<Booking[]> {
-    try {
-      const bookings = await BookingModel.find({ artistId, status: 'marked' }).populate('clientId').exec();
+  async getBookingsByArtistIdMarked(artistId: string,clientId:string): Promise<Booking[]> {
+    try {let bookings;
+      if(artistId){
+       bookings = await BookingModel.find({ artistId, status: 'marked' }).populate('clientId').exec();}
+       else{
+        bookings = await BookingModel.find({ clientId, status: 'marked' }).populate('artistId').exec();}
       return bookings;
     } catch (error) {
       console.error('Error getting bookings by artist ID:', error);
@@ -167,7 +185,7 @@ export class BookingRepository implements IBookingRepository {
     try {
       const updatedBooking = await BookingModel.findByIdAndUpdate(
         bookingId,
-        { status },
+        { status,payment_method:'wallet' },
         { new: true }
       ).exec();
 
@@ -181,6 +199,50 @@ export class BookingRepository implements IBookingRepository {
       throw new Error('Failed to update booking status');
     }
   }
+  async findAvailablePeopleByDateRange(startDate: Date, endDate: Date,category:string): Promise<User[]> {
+    try {
+      // Find all booked artistIds within the date range
+      const bookings = await BookingModel.find({
+        status: 'booked',
+        date_of_booking: {
+          $elemMatch: {
+            $gte: startDate,
+            $lte: endDate
+          }
+        }
+      }).select('artistId');
+  
+      const bookedArtistIds = bookings.map(booking => booking.artistId);
+  
+      const availableArtists = await UserModel.aggregate([
+        {
+          $match: {
+            _id: { $nin: bookedArtistIds },
+            category,
+            posts: { $exists: true, $ne: [] } 
+          }
+        },
+        {
+          $lookup: {
+            from: 'posts', 
+            localField: 'posts',
+            foreignField: '_id',
+            as: 'posts'
+          }
+        },
+        {
+          $match: {
+            'posts.0': { $exists: true } 
+          }
+        }
+      ]);
+  
+      return availableArtists;
+    } catch (error) {
+      console.error('Error finding available people by date range:', error);
+      throw new Error('Failed to find available people');
+    }
 }
 
-export default BookingRepository;
+}
+export default BookingRepository

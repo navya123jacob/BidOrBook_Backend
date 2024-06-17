@@ -7,7 +7,6 @@ import http from 'http';
 const port = process.env.PORT || 3000; 
 const server = http.createServer(app);
 
-// Initialize Socket.IO server
 const io = initializeSocket(server);
 
 const start = async () => {
@@ -24,5 +23,4 @@ const start = async () => {
 
 start();
 
-// Export the io instance
 export { io };

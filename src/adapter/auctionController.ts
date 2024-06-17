@@ -4,10 +4,17 @@ import IAuctionController from '../use_case/interface/ControllerInterface/Iaucti
 import { cloudinary } from '../FrameWork/utils/CloudinaryConfig';
 import { Server } from 'socket.io';
 import { io } from '..';
+import Stripe from 'stripe';
+import IUserUseCase from '../use_case/interface/useCaseInterface/IUserUseCase';
+import PdfService from '../FrameWork/utils/Invoice'
+const pdfService = PdfService;
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
+const stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' });
+
 class AuctionController implements IAuctionController {
   private auctionUseCase: IAuctionUseCase;
- 
-  constructor(auctionUseCase: IAuctionUseCase) {
+  
+  constructor(auctionUseCase: IAuctionUseCase,private stripe: Stripe, private userUseCase: IUserUseCase,) {
     this.auctionUseCase = auctionUseCase;
    
   }
@@ -23,7 +30,17 @@ class AuctionController implements IAuctionController {
         description,
         userId,
         endingdate,
-        initial:parseInt(initial)
+        initial:parseInt(initial),
+        paymentmethod:'',
+        payment:'pending',
+        address: {
+          addressline: '',
+          district: '',
+          state: '',
+          country: '',
+          pincode: 0,
+          phonenumber:0,
+        },
       };
 
       if (req.file) {
@@ -136,6 +153,93 @@ class AuctionController implements IAuctionController {
       res.status(500).json({ message: (error as Error).message });
     }
   }
+  async createCheckoutSessionAuction(req: Request, res: Response): Promise<void> {
+    try {
+      const { auctionId, amount, artistId, clientId,address } = req.body;
+  console.log(address)
+      
+      const successUrl = `http://localhost:5173/artpho/auction?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
+      
+      const cancelUrl = `http://localhost:5173/artpho/auction?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
+  
+      const session = await this.stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'inr',
+              product_data: {
+                name: `Auction ID: ${auctionId.toString()}`,
+              },
+              unit_amount: amount * 100,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        metadata: {
+          auctionId: auctionId? auctionId.toString() : '',
+          addressline: address.addressline || '',
+        district: address.district || '',
+        state: address.state || '',
+        country: address.country || '',
+        pincode: address.pincode ? address.pincode : '',
+        phonenumber: address.phonenumber ? address.phonenumber : '',
+
+        },
+      });
+  
+      res.json({ id: session.id, url: session.url });
+    } catch (error) {
+      console.error('Error creating Stripe checkout session:', error);
+      res.status(500).json({ message: 'Failed to create checkout session' });
+    }
+  }
+
+  async walletPaymentAuction(req: Request, res: Response): Promise<void> {
+    try {
+      const { auctionId, amount, clientId ,address} = req.body;
+      
+      if (!auctionId || !amount || !clientId) {
+        res.status(400).json({ message: 'Missing required fields' });
+        return;
+      }
+      
+      const updatedWallet = await this.userUseCase.deductFromWallet(clientId, amount);
+      if (!updatedWallet) {
+        res.status(400).json({ message: 'Insufficient funds in wallet' });
+        return;
+      }
+      
+      const updatedAuction = await this.auctionUseCase.updateAuctionWallet(auctionId,address);
+      
+      // await pdfService.generateAndDownloadInvoice(updatedAuction, res);
+      res.status(200).json({ message: 'Payment successful and auction updated', updatedAuction });
+    } catch (error) {
+      console.error('Error processing wallet payment:', error);
+      res.status(500).json({ message: 'Failed to process wallet payment' });
+    }
+  }
+
+  async getAuctionsByBidder(req: Request, res: Response): Promise<void> {
+    try {
+      const { clientId } = req.body;
+
+      if (!clientId) {
+        res.status(400).json({ error: 'ClientId is required' });
+        return;
+      }
+
+      const auctions = await this.auctionUseCase.getAuctionsByBidder(clientId);
+      res.status(200).json({ auctions });
+    } catch (error) {
+      console.error('Error fetching auctions by bidder:', error);
+      res.status(500).json({ error: 'Failed to fetch auctions' });
+    }
+  }
+  
 }
 
 export default AuctionController;
