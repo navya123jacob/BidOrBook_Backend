@@ -8,5 +8,6 @@ router.post('/login', (req, res) => adminController.login(req, res));
 router.get('/users', protectAdmin, (req, res) => adminController.getAllUsers(req, res));
 router.put('/block/:userId', protectAdmin, (req, res) => adminController.blockUser(req, res));
 router.put('/unblock/:userId', protectAdmin, (req, res) => adminController.unblockUser(req, res));
+router.get('/logout', protectAdmin, (req, res) =>adminController.logout(req, res));
 
 export default router;

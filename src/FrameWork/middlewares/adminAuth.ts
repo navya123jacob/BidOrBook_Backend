@@ -3,11 +3,11 @@ import { Request, Response, NextFunction } from 'express';
 import AdminRepository from '../repository/AdminRepository';
 import Encrypt from '../passwordRepository/hashpassword';
 import { Admin } from '../../Domain/Admin';
-import JWTToken from '../passwordRepository/jwtpassword';
+import AdminJWTToken from '../passwordRepository/adminjwtpassword';
 
 // Dependency Injection for Middleware
 const encrypt = new Encrypt();
-const jwtToken = new JWTToken();
+const jwtToken = new AdminJWTToken();
 const adminRepo = new AdminRepository(encrypt);
 
 declare global {
@@ -21,7 +21,7 @@ declare global {
 export const protectAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const accessToken = req.cookies.adminJWT;
-
+    
     if (!accessToken) {
       return res.status(401).json({ message: "Access Denied: No access token provided." });
     }
@@ -29,9 +29,10 @@ export const protectAdmin = async (req: Request, res: Response, next: NextFuncti
     let decoded: JwtPayload;
     try {
       decoded = jwt.verify(accessToken, process.env.ADMIN_ACCESS_TOKEN_SECRET as string) as JwtPayload;
-      req.adminId = decoded.adminId;
+      
+      req.adminId = decoded.userId;
 
-      const admin: Admin | null = await adminRepo.findById(decoded.adminId);
+      const admin: Admin | null = await adminRepo.findById(decoded.userId);
       if (!admin) {
         return res.status(401).json({ message: 'Not authorized, admin not found' });
       }
@@ -46,7 +47,7 @@ export const protectAdmin = async (req: Request, res: Response, next: NextFuncti
 
         try {
           const decodedRefresh = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET as string) as JwtPayload;
-          const admin: Admin | null = await adminRepo.findById(decodedRefresh.adminId);
+          const admin: Admin | null = await adminRepo.findById(decodedRefresh.userId);
 
           if (!admin || admin.refreshToken !== refreshToken) {
             return res.status(401).json({ message: 'Not authorized, invalid refresh token' });
@@ -59,7 +60,7 @@ export const protectAdmin = async (req: Request, res: Response, next: NextFuncti
             maxAge: 30 * 24 * 60 * 60 * 1000
           });
 
-          req.adminId = decodedRefresh.adminId;
+          req.adminId = decodedRefresh.userId;
           next();
         } catch (refreshErr) {
           return res.status(401).json({ message: 'Not authorized, invalid refresh token' });

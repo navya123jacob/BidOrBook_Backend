@@ -3,14 +3,14 @@ import { User } from "../Domain/userEntity";
 import IAdminUseCase from "./interface/useCaseInterface/IAdminUsecase";
 import IAdminRepo from "./interface/RepositoryInterface/IAdminRepository";
 import Encrypt from "../FrameWork/passwordRepository/hashpassword";
-import JWTToken from "../FrameWork/passwordRepository/jwtpassword";
+import AdminJWTToken from "../FrameWork/passwordRepository/adminjwtpassword";
 
 class AdminUseCase implements IAdminUseCase {
   private adminRepo: IAdminRepo;
   private encrypt: Encrypt;
-  private jwtToken: JWTToken;
+  private jwtToken: AdminJWTToken;
 
-  constructor(adminRepo: IAdminRepo, encrypt: Encrypt, jwtToken: JWTToken) {
+  constructor(adminRepo: IAdminRepo, encrypt: Encrypt, jwtToken: AdminJWTToken) {
     this.adminRepo = adminRepo;
     this.encrypt = encrypt;
     this.jwtToken = jwtToken;
@@ -18,10 +18,13 @@ class AdminUseCase implements IAdminUseCase {
 
  
 
-  async login(email: string, password: string): Promise<{ accessToken: string; refreshToken: string }> {
+  async login(email: string, password: string): Promise<{ accessToken: string; refreshToken: string,admin:Admin }> {
     const admin = await this.adminRepo.findByEmail(email);
     if (!admin) {
       throw new Error('Invalid email or password');
+    }
+    if(!admin.isAdmin){
+      throw new Error('Not Admin');
     }
 
     const isMatch = await this.encrypt.compare(password, admin.password);
@@ -34,7 +37,7 @@ class AdminUseCase implements IAdminUseCase {
 
     await this.adminRepo.findOneAndUpdate(adminId, { refreshToken });
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken,admin };
   }
 
   async getAllUsers(): Promise<User[]> {

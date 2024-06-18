@@ -28,7 +28,7 @@ class AdminController implements IAdminController {
         secure: process.env.NODE_ENV !== 'development',
         maxAge: 30 * 24 * 60 * 60 * 1000 
       });
-      res.status(200).json({ status: true, message: 'Login successful!' });
+      res.status(200).json(tokens.admin);
     } catch (error: any) {
       res.status(500).json({ status: false, message: error.message });
     }
@@ -36,6 +36,7 @@ class AdminController implements IAdminController {
 
   async getAllUsers(req: Request, res: Response): Promise<void> {
     try {
+      
       const users = await this.adminUseCase.getAllUsers();
       res.status(200).json(users);
     } catch (error: any) {
@@ -46,6 +47,7 @@ class AdminController implements IAdminController {
   async blockUser(req: Request, res: Response): Promise<void> {
     try {
       const { userId } = req.params;
+      console.log(userId)
       const user = await this.adminUseCase.blockUser(userId);
       res.status(200).json(user);
     } catch (error: any) {
@@ -60,6 +62,28 @@ class AdminController implements IAdminController {
       res.status(200).json(user);
     } catch (error: any) {
       res.status(500).json({ status: false, message: error.message });
+    }
+  }
+  async logout(req: Request, res: Response): Promise<void> {
+    try {
+      res.cookie('adminJWT', '', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: process.env.NODE_ENV !== 'development',
+        expires: new Date(0)
+      });
+
+      res.cookie('adminRefreshToken', '', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: process.env.NODE_ENV !== 'development',
+        expires: new Date(0)
+      });
+
+      res.status(200).json("Logged Out Successfully");
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "An error occurred while logging out" });
     }
   }
 }

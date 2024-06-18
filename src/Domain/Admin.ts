@@ -5,5 +5,8 @@ export interface Admin {
     password: string;
     isAdmin: boolean;
     refreshToken?: string;
+    Fname:string;
+    Lname:string,
+    profile:string
   }
   

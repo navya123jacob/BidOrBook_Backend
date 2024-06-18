@@ -44,6 +44,7 @@ class AdminRepository implements IAdminRepo {
 
   async blockUser(userId: string): Promise<User | null> {
     const user = await UserModel.findById(userId);
+    
     if (!user) {
       throw new Error('User not found');
     }
