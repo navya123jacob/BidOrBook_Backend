@@ -3,6 +3,7 @@ import { Booking, Location } from '../../Domain/Booking';
 import IBookingRepository from '../../use_case/interface/RepositoryInterface/IbookingRepo';
 import { User } from '../../Domain/userEntity';
 import { UserModel } from '../database/userModel';
+import { Types } from 'mongoose';
 
  class BookingRepository implements IBookingRepository {
   async findByArtistIdAndDateRange(artistId: string, startDate: Date, endDate: Date, bookingId: string): Promise<Date[]> {
@@ -199,9 +200,9 @@ import { UserModel } from '../database/userModel';
       throw new Error('Failed to update booking status');
     }
   }
-  async findAvailablePeopleByDateRange(startDate: Date, endDate: Date,category:string): Promise<User[]> {
+  async findAvailablePeopleByDateRange(startDate: Date, endDate: Date,category:string,usernotid:string): Promise<User[]> {
     try {
-      // Find all booked artistIds within the date range
+      const userNotObjectId = new Types.ObjectId(usernotid);
       const bookings = await BookingModel.find({
         status: 'booked',
         date_of_booking: {
@@ -217,7 +218,7 @@ import { UserModel } from '../database/userModel';
       const availableArtists = await UserModel.aggregate([
         {
           $match: {
-            _id: { $nin: bookedArtistIds },
+            _id: { $nin: bookedArtistIds, $ne: userNotObjectId },
             category,
             posts: { $exists: true, $ne: [] } 
           }

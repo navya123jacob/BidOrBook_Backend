@@ -39,7 +39,8 @@ class AdminRepository implements IAdminRepo {
   }
 
   async getAllUsers(): Promise<User[]> {
-    return await UserModel.find();
+    return await UserModel.find().populate('spam.userId');
+
   }
 
   async blockUser(userId: string): Promise<User | null> {

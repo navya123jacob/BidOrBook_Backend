@@ -19,7 +19,8 @@ class PostController implements IPostController {
       const updateData: any = {
         userid,
         name,
-        description
+        description,
+        is_blocked:false
       };
       if (req.file) {
         try {
@@ -55,6 +56,58 @@ class PostController implements IPostController {
       res.status(500).json({ error: 'Failed to delete post' });
     }
   }
+  async markPostAsSpam(req: Request, res: Response): Promise<void> {
+    const { id } = req.params; 
+    const { userId, reason } = req.body;
+  
+    try {
+      await this.postUseCase.markPostAsSpam(id, userId, reason);
+      res.status(200).json({ message: 'Post marked as spam' });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+  async UnmarkPostAsSpam(req: Request, res: Response): Promise<void> {
+    const { id } = req.params; 
+    const { userId } = req.body;
+  
+    try {
+      await this.postUseCase.unmarkPostAsSpam(id, userId);
+      res.status(200).json({ message: 'Post unmarked as spam' });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+  async getPostsWithSpam(req: Request, res: Response): Promise<void> {
+    try {
+      const posts = await this.postUseCase.getPostsWithSpam();
+      res.status(200).json(posts);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  }
+  async blockPost(req: Request, res: Response): Promise<void> {
+    try {
+      const { postId } = req.params;
+      console.log(postId)
+      await this.postUseCase.blockPost(postId);
+      res.status(200).send({ message: 'Post blocked successfully' });
+    } catch (error) {
+      res.status(500).send({ message: 'Error blocking post', error });
+    }
+  };
+  
+  async unblockPost(req: Request, res: Response): Promise<void> {
+    try {
+      const { postId } = req.params;
+      
+      await this.postUseCase.unblockPost(postId);
+      res.status(200).send({ message: 'Post unblocked successfully' });
+    } catch (error) {
+      res.status(500).send({ message: 'Error unblocking post', error });
+    }
+  };
 }
 
 export default PostController;

@@ -278,6 +278,24 @@ async deductFromWallet(userId: string, amount: number): Promise<User | null> {
   return this.userRepository.updateWallet(userId, newBalance);
 }
 
+async spamUser(userId: Types.ObjectId, spamInfo: { userId: Types.ObjectId, reason: string }): Promise<{ status: number; data: { status: boolean; message: string } }> {
+  try {
+      const user = await this.userRepository.spamUser(userId, spamInfo);
+      return {
+          status: 200,
+          data: { status: true, message: 'User has been marked as spam.' }
+      };
+  } catch (error) {
+      return {
+          status: 500,
+          data: { status: false, message: (error as Error).message }
+      };
+  }
+}
+async unspamUserUseCase(userId: string,id: string): Promise<User|null>{
+  return await this.userRepository.unspamUserRepository(userId,id);
+};
+
 }
 
 export default UserUseCase;

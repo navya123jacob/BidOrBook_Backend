@@ -6,6 +6,10 @@ export interface Location {
     district: string;
     country: string;
 }
+export interface Spam {
+    userId: Types.ObjectId;
+    reason: string;
+}
 
 export interface User {
     _id: Types.ObjectId;
@@ -29,6 +33,7 @@ export interface User {
     profile: string;
     description: string;
     refreshToken?: string;  
-    wallet:number
+    wallet:number;
+    spam: Spam[];
     
 }

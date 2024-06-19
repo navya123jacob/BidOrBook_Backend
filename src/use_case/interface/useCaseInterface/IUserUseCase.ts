@@ -18,7 +18,9 @@ removeBookingIdFromUser(userId: string, bookingId: string): Promise<void>;
 updateWallet(id: string, amount: number): Promise<User | null>;
 deductFromWallet(userId: string, amount: number): Promise<User | null>;
 updateWalletCancel(id: string, amount: number): Promise<User | null>;
-SingleUser(id: string): Promise<User | null>
+SingleUser(id: string): Promise<User | null>;
+spamUser(userId: Types.ObjectId, spamInfo: { userId: Types.ObjectId, reason: string }): Promise<{ status: number; data: { status: boolean; message: string } }>;
+unspamUserUseCase(userId: string,id: string): Promise<User|null>
 }
 
 export default IUserUseCase;

@@ -29,7 +29,11 @@ const userSchema: Schema<User & Document> = new mongoose.Schema({
     },
     description: { type: String, default: "" },
     refreshToken: { type: String, default: "" },
-    wallet: { type: Number, default: 0 }
+    wallet: { type: Number, default: 0 },
+    spam: [{
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        reason: { type: String, required: true }
+    }]
 });
 
 const UserModel: Model<User & Document> = mongoose.model<User & Document>('User', userSchema);

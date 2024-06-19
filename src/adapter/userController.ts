@@ -5,6 +5,7 @@ import IGenerateOTP from "../use_case/interface/services/IgenerateOtp";
 import { User } from "../Domain/userEntity";
 import { cloudinary } from "../FrameWork/utils/CloudinaryConfig";
 import IUserController from "../use_case/interface/ControllerInterface/IuserController";
+import { Types } from "mongoose";
 
 class UserController implements IUserController {
   private userCase: IUserUsecases;
@@ -304,6 +305,30 @@ class UserController implements IUserController {
       res.status(500).json({ error: (error as Error).message });
     }
   }
+  async spamUser(req: Request, res: Response): Promise<void> {
+    try {
+        const { userId, reason } = req.body;
+        const spamInfo = {
+            userId: new Types.ObjectId(userId),
+            reason
+        };
+        const userIdToSpam = new Types.ObjectId(req.params.id); 
+        const result = await this.userCase.spamUser(userIdToSpam, spamInfo);
+        res.status(result.status).json(result.data);
+    } catch (error) {
+        res.status(500).json({ status: false, message: (error as Error).message });
+    }
+}
+async unspamUser(req: Request, res: Response): Promise<void>{
+  const { userId } = req.body;
+  const id=req.params.id
+  try {
+    const result = await this.userCase.unspamUserUseCase(userId,id);
+    res.status(200).json({ message: "User unspammed successfully", result });
+  } catch (error) {
+    res.status(500).json({ message: "Error unspamming user", error });
+  }
+}
 }
 
 export default UserController;

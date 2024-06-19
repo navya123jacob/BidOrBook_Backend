@@ -271,7 +271,7 @@ async walletPayment(req: Request, res: Response): Promise<void> {
 
 async findAvailablePeople(req: Request, res: Response): Promise<void> {
   try {
-    const { startDate, endDate,category } = req.body;
+    const { startDate, endDate,category,usernotid } = req.body;
     if (!startDate || !endDate) {
       res.status(400).json({ message: 'startDate and endDate are required' });
       return;
@@ -280,7 +280,7 @@ async findAvailablePeople(req: Request, res: Response): Promise<void> {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    const result = await this.bookingUseCase.findAvailablePeople(start, end,category);
+    const result = await this.bookingUseCase.findAvailablePeople(start, end,category,usernotid);
     res.json(result);
   } catch (error) {
     res.status(500).json({ message: 'Internal server error: ' + (error as Error).message });

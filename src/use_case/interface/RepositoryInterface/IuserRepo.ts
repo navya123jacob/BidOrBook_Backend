@@ -14,7 +14,9 @@ interface IUserRepo {
     addBookingIdToUser(artistId: string, bookingId: Types.ObjectId): Promise<void>;
     pullBookingId(userId: string, bookingId: string): Promise<void>;
     updateWallet(id: string, amount: number):Promise<User | null>;
-    updateWalletCancel(id: string, amount: number): Promise<User | null>
+    updateWalletCancel(id: string, amount: number): Promise<User | null>;
+    spamUser(userId: Types.ObjectId, spamInfo: { userId: Types.ObjectId, reason: string }): Promise<User | null>;
+    unspamUserRepository (userId: string,id:string):Promise<User|null>;
 }
 
 export default IUserRepo;

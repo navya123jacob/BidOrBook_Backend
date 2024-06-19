@@ -21,10 +21,17 @@ router.post('/allpost', protect, (req, res) => userController.getAllPosts(req, r
 router.post('/singleposts/:id', protect, (req, res) => userController.singleUserPost(req, res));
 router.get('/logout', protect, (req, res) => userController.logout(req, res));
 router.get('/SingleUser/:id', protect, (req, res) => userController.SingleUser(req, res));
+router.post("/spam/:id", protect, (req, res) => userController.spamUser(req, res));
+router.post('/unspam/:id',protect,(req, res) => userController.unspamUser(req, res));
 
 // Post routes
 router.post('/createpost', protect, upload.single('image'), (req, res) => postController.createPost(req, res));
 router.delete('/deletepost', protect, (req, res) => postController.deletePost(req, res));
+router.post('/postsspam/:id', protect, (req, res) => postController.markPostAsSpam(req, res));
+router.post('/postsunspam/:id', protect, (req, res) => postController.UnmarkPostAsSpam(req, res));
+router.get('/posts-with-spam',protect, (req, res) => postController.getPostsWithSpam(req, res));
+router.post('/:postId/block',protect, (req, res) =>  postController.blockPost(req, res));
+router.post('/:postId/unblock',protect, (req, res) =>  postController.unblockPost(req, res));
 
 // Booking routes
 router.post('/checkavailability', protect, (req, res) => bookingController.checkAvailability(req, res));

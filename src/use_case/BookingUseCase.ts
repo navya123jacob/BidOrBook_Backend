@@ -72,8 +72,8 @@ export class BookingUseCase implements IBookingUseCase {
       async updateBookingStatus(bookingId: string, status: string): Promise<Booking> {
         return this.bookingRepository.updateBookingStatus(bookingId, status);
       }
-      async findAvailablePeople(startDate: Date, endDate: Date,category:string): Promise<User[]> {
-        const availablePeople = await this.bookingRepository.findAvailablePeopleByDateRange(startDate, endDate,category);
+      async findAvailablePeople(startDate: Date, endDate: Date,category:string,usernotid:string): Promise<User[]> {
+        const availablePeople = await this.bookingRepository.findAvailablePeopleByDateRange(startDate, endDate,category,usernotid);
         return availablePeople;
       }
 
