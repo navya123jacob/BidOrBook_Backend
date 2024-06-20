@@ -244,6 +244,9 @@ import { Types } from 'mongoose';
       throw new Error('Failed to find available people');
     }
 }
+async findBookingsByArtistAndClient(): Promise<Booking[]> {
+  return await BookingModel.find({} ).populate('artistId clientId').exec();
+}
 
 }
 export default BookingRepository

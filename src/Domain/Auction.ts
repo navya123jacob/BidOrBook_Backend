@@ -1,4 +1,8 @@
 import { Document, Types } from 'mongoose';
+export interface Spam {
+  userId: Types.ObjectId;
+  reason: string;
+}
 export interface Address{
   addressline: string;
   district: string;
@@ -26,5 +30,7 @@ export interface IAuction extends Document {
     country: string;
     pincode: number;
     phonenumber: number;
+    
   };
+  spam:Spam[];
 }

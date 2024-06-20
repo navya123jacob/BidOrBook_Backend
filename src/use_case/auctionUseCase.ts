@@ -50,6 +50,18 @@ class AuctionUseCase implements IAuctionUseCase {
   async getAuctionsByBidder(clientId: string): Promise<IAuction[]> {
     return await this.auctionRepo.getAuctionsByBidder(clientId);
   }
+  async addSpam(auctionId: string, userId: string, reason: string): Promise<IAuction | null> {
+    return await this.auctionRepo.addSpam(auctionId, userId, reason);
+  }
+  async removeSpam(auctionId: string, userId: string): Promise<IAuction | null> {
+    return await this.auctionRepo.removeSpam(auctionId, userId);
+  }
+  async getAllAuctionsWithUserDetails(): Promise<IAuction[]> {
+    return await this.auctionRepo.getAllAuctionsWithUserDetails();
+  }
+  
+  
+  
 }
 
 export default AuctionUseCase;

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import IAdminUseCase from '../use_case/interface/useCaseInterface/IAdminUsecase';
 import { Admin } from '../Domain/Admin';
 import IAdminController from '../use_case/interface/ControllerInterface/IAdminController';
-
+import { cloudinary } from '../FrameWork/utils/CloudinaryConfig';
 class AdminController implements IAdminController {
   private adminUseCase: IAdminUseCase;
 
@@ -84,6 +84,51 @@ class AdminController implements IAdminController {
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "An error occurred while logging out" });
+    }
+  }
+  async updateAdmin(req: Request, res: Response): Promise<void> {
+    try {
+      const { _id } = req.body;
+      const updateData: any = {
+        Fname: req.body.Fname,
+        Lname: req.body.Lname,
+      };
+
+      if (req.files && (req.files as any).profile) {
+        try {
+          const profileFile = (req.files as any).profile[0];
+          const result = await cloudinary.uploader.upload(profileFile.path);
+          updateData.profile = result.secure_url;
+        } catch (error) {
+          console.error('Cloudinary upload error:', error);
+          res.status(400).json({ error: 'Failed to upload profile image to Cloudinary' });
+          return;
+        }
+      }
+
+      if (req.files && (req.files as any).bg) {
+        try {
+          const bgFile = (req.files as any).bg[0];
+          const result = await cloudinary.uploader.upload(bgFile.path);
+          updateData.bg = result.secure_url;
+        } catch (error) {
+          console.error('Cloudinary upload error:', error);
+          res.status(400).json({ error: 'Failed to upload background image to Cloudinary' });
+          return;
+        }
+      }
+
+      const updatedAdmin = await this.adminUseCase.updateAdmin(_id, updateData);
+
+      if (!updatedAdmin) {
+        res.status(404).json({ success: false, message: 'Admin not found' });
+        return;
+      }
+
+      res.status(200).json({ success: true, admin: updatedAdmin });
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
   }
 }

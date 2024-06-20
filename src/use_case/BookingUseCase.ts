@@ -76,5 +76,8 @@ export class BookingUseCase implements IBookingUseCase {
         const availablePeople = await this.bookingRepository.findAvailablePeopleByDateRange(startDate, endDate,category,usernotid);
         return availablePeople;
       }
+      async getAllBookingsByArtistAndClient(): Promise<Booking[]> {
+        return await this.bookingRepository.findBookingsByArtistAndClient();
+      }
 
 }

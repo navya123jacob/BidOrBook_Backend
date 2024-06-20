@@ -14,7 +14,8 @@ interface IBookingRepository {
  findBySessionId(sessionId: string): Promise<Booking | null>;
  updateBookingStripe(booking: Booking): Promise<Booking>;
  updateBookingStatus(bookingId: string, status: string): Promise<Booking>;
- findAvailablePeopleByDateRange(startDate: Date, endDate: Date,category:string,usernotid:string): Promise<User[]> 
+ findAvailablePeopleByDateRange(startDate: Date, endDate: Date,category:string,usernotid:string): Promise<User[]>;
+ findBookingsByArtistAndClient(): Promise<Booking[]> 
 }
 
 export default IBookingRepository;

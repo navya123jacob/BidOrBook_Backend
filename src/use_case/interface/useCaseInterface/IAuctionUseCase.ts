@@ -10,5 +10,8 @@ export default interface IAuctionUseCase {
   cancelBid(auctionId: string, userId: string): Promise<IAuction>;
   handleSuccessfulPayment(auctionId: string,address:Address): Promise<void>;
   updateAuctionWallet(AuctionId: string,address:Address): Promise<IAuction>;
-  getAuctionsByBidder(clientId: string): Promise<IAuction[]>
+  getAuctionsByBidder(clientId: string): Promise<IAuction[]>;
+  addSpam(auctionId: string, userId: string, reason: string): Promise<IAuction | null>;
+  removeSpam(auctionId: string, userId: string): Promise<IAuction | null>;
+  getAllAuctionsWithUserDetails(): Promise<IAuction[]>;
 }

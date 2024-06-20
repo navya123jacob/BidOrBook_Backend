@@ -4,6 +4,7 @@ import IAdminUseCase from "./interface/useCaseInterface/IAdminUsecase";
 import IAdminRepo from "./interface/RepositoryInterface/IAdminRepository";
 import Encrypt from "../FrameWork/passwordRepository/hashpassword";
 import AdminJWTToken from "../FrameWork/passwordRepository/adminjwtpassword";
+import { cloudinary } from "../FrameWork/utils/CloudinaryConfig";
 
 class AdminUseCase implements IAdminUseCase {
   private adminRepo: IAdminRepo;
@@ -50,6 +51,9 @@ class AdminUseCase implements IAdminUseCase {
 
   async unblockUser(userId: string): Promise<User | null> {
     return await this.adminRepo.unblockUser(userId);
+  }
+  async updateAdmin(_id: string, updateData: Partial<Admin>): Promise<Admin | null> {
+    return await this.adminRepo.findOneAndUpdate(_id, updateData);
   }
 }
 

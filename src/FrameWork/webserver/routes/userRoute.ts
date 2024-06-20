@@ -45,6 +45,8 @@ router.put('/update-booking', protect, (req, res) => bookingController.updateBoo
 router.delete('/cancelPaymentReq', protect, (req, res) => bookingController.cancelPaymentReq(req, res));
 router.post('/wallet-payment', protect, (req, res) => bookingController.walletPayment(req, res));
 router.post('/find-available-people',protect, (req, res) => bookingController.findAvailablePeople(req, res));
+router.get('/Allbookings',protect, (req, res) => bookingController.getAllBookingsByArtistAndClient(req, res));
+
 
 // Stripe routes
 router.post('/create-checkout-session', protect, (req, res) => bookingController.createCheckoutSession(req, res));
@@ -65,5 +67,8 @@ router.post('/place-bid', protect, (req, res) => auctionController.placeBid(req,
 router.post('/cancelBid',protect, (req, res) => auctionController.cancelBid(req, res));
 router.post('/wallet-payment-auction', protect, (req, res) => auctionController.walletPaymentAuction(req, res));
 router.post('/auctions-by-bidder',protect,(req, res) => auctionController.getAuctionsByBidder(req, res));
+router.post('/auction/spam',protect,(req, res) => auctionController.addSpam(req, res));
+router.post('/auction/spam/remove',protect,(req, res) => auctionController.removeSpam(req, res));
+router.get('/auctions/user-details',protect,(req, res) => auctionController.getAllAuctionsWithUserDetails(req, res));
 
 export default router;

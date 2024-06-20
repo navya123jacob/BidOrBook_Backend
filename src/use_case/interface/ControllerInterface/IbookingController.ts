@@ -14,6 +14,7 @@ interface BookingControllerInterface {
   createCheckoutSession(req: Request, res: Response): Promise<void>;
   walletPayment(req: Request, res: Response): Promise<void>;
   findAvailablePeople(req: Request, res: Response): Promise<void>;
+  getAllBookingsByArtistAndClient(req: Request, res: Response): Promise<void>;
   
 }
 

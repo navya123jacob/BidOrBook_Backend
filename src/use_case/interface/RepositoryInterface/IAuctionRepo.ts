@@ -10,6 +10,9 @@ export default interface IAuctionRepo {
   cancelBid(auctionId: string, userId: string): Promise<IAuction >;
   updateAuctionStripe(auction:IAuction): Promise<IAuction>;
   updateAuctionWallet(auctionId: string,address:Address): Promise<IAuction>;
-  getAuctionsByBidder(clientId: string): Promise<IAuction[]> 
+  getAuctionsByBidder(clientId: string): Promise<IAuction[]>;
+  addSpam(auctionId: string, userId: string, reason: string): Promise<IAuction | null>;
+  removeSpam(auctionId: string, userId: string): Promise<IAuction | null>;
+  getAllAuctionsWithUserDetails(): Promise<IAuction[]>
 
 }

@@ -23,6 +23,10 @@ const auctionSchema = new Schema< IAuction>({
     pincode: { type: Number},
     phonenumber: { type: Number},
   },
+  spam: [{
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    reason: { type: String, required: true }
+}],
 });
 
 

@@ -11,7 +11,8 @@ const AdminSchema: Schema<Admin & Document> = new mongoose.Schema({
   refreshToken: { type: String },
   Fname: { type: String, required: true },
   Lname: { type: String, required: true },
-  profile: { type: String, required: true }
+  profile: { type: String, required: true },
+  bg:{ type: String, required: true },
   
 });
 

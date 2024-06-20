@@ -7,6 +7,7 @@ export interface Admin {
     refreshToken?: string;
     Fname:string;
     Lname:string,
-    profile:string
+    profile:string,
+    bg:string
   }
   

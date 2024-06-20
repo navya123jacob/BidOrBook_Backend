@@ -121,7 +121,10 @@ async findOneAndUpdate(_id: Types.ObjectId | string, update: Partial<User>): Pro
           query.$expr = { $and: conditions };
         }
         
-        const usersWithPosts = await UserModel.find(query).populate('posts').exec();
+        const usersWithPosts = await UserModel.find(query).populate({
+          path: 'posts',
+          match: { is_blocked: false } 
+        }).exec();
         const filteredUsers = usersWithPosts.filter(user => user.posts.length > 0);
   
         return filteredUsers;

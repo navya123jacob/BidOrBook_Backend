@@ -239,6 +239,51 @@ class AuctionController implements IAuctionController {
       res.status(500).json({ error: 'Failed to fetch auctions' });
     }
   }
+  async addSpam(req: Request, res: Response): Promise<void> {
+    try {
+      const { auctionId, userId, reason } = req.body;
+  
+      if (!auctionId || !userId || !reason) {
+        res.status(400).json({ error: 'Missing required fields' });
+        return;
+      }
+  
+      const updatedAuction = await this.auctionUseCase.addSpam(auctionId, userId, reason);
+  
+      res.status(200).json({ message: 'Spam reported successfully', auction: updatedAuction });
+    } catch (error) {
+      console.error('Error reporting spam:', error);
+      res.status(500).json({ error: 'Failed to report spam' });
+    }
+  }
+  async removeSpam(req: Request, res: Response): Promise<void> {
+    try {
+      const { auctionId, userId } = req.body;
+  
+      if (!auctionId || !userId) {
+        res.status(400).json({ error: 'Missing required fields' });
+        return;
+      }
+  
+      const updatedAuction = await this.auctionUseCase.removeSpam(auctionId, userId);
+  
+      res.status(200).json({ message: 'Spam removed successfully', auction: updatedAuction });
+    } catch (error) {
+      console.error('Error removing spam:', error);
+      res.status(500).json({ error: 'Failed to remove spam' });
+    }
+  }
+  
+  async getAllAuctionsWithUserDetails(req: Request, res: Response): Promise<void> {
+    try {
+      const auctions = await this.auctionUseCase.getAllAuctionsWithUserDetails();
+      res.status(200).json({ auctions });
+    } catch (error) {
+      console.error('Error fetching auctions with user details:', error);
+      res.status(500).json({ error: 'Failed to fetch auctions' });
+    }
+  }
+  
   
 }
 

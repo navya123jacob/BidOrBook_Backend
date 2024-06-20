@@ -103,7 +103,45 @@ class AuctionRepository implements IAuctionRepo {
     return AuctionModel.find({ 'bids.userId': clientId }).exec();
   }
   
-
+  async addSpam(auctionId: string, userId: string, reason: string): Promise<IAuction | null> {
+    const spam = { userId, reason };
+    const updatedAuction = await AuctionModel.findByIdAndUpdate(
+      auctionId,
+      { $push: { spam: spam } },
+      { new: true }
+    ).exec();
+  
+    if (!updatedAuction) {
+      throw new Error('Auction not found');
+    }
+  
+    return updatedAuction;
+  }
+  async removeSpam(auctionId: string, userId: string): Promise<IAuction | null> {
+    const updatedAuction = await AuctionModel.findByIdAndUpdate(
+      auctionId,
+      { $pull: { spam: { userId } } },
+      { new: true }
+    ).exec();
+  
+    if (!updatedAuction) {
+      throw new Error('Auction not found');
+    }
+  
+    return updatedAuction;
+  }
+  async getAllAuctionsWithUserDetails(): Promise<IAuction[]> {
+    return await AuctionModel.find()
+      .populate('userId') 
+      .populate({
+        path: 'bids.userId', 
+        model: 'User', 
+      })
+      .exec();
+  }
+  
+  
+  
 }
 
 export default AuctionRepository;

@@ -286,6 +286,15 @@ async findAvailablePeople(req: Request, res: Response): Promise<void> {
     res.status(500).json({ message: 'Internal server error: ' + (error as Error).message });
   }
 }
+async getAllBookingsByArtistAndClient(req: Request, res: Response): Promise<void> {
+  try {
+  
+    const bookings = await this.bookingUseCase.getAllBookingsByArtistAndClient();
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
 
 }
 

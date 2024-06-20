@@ -13,5 +13,6 @@ export interface IBookingUseCase {
     cancelPaymentReq(_id: string): Promise<Booking>;
     handleSuccessfulPayment(sessionId: string): Promise<void>;
     updateBookingStatus(bookingId: string, status: string): Promise<Booking>;
-    findAvailablePeople(startDate: Date, endDate: Date,category:string,usernotid:string): Promise<User[]> 
+    findAvailablePeople(startDate: Date, endDate: Date,category:string,usernotid:string): Promise<User[]>;
+    getAllBookingsByArtistAndClient(): Promise<Booking[]>
 }
