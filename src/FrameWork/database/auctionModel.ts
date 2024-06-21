@@ -7,8 +7,8 @@ const auctionSchema = new Schema< IAuction>({
   description:{type:String},
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   image: { type: String, required: true },
-  bids: { 
-    userId:{type: String}, amount:{type:Number}},
+  bids:[ { 
+    userId:{type: String}, amount:{type:Number}}],
   startingdate: { type: Date, default: Date.now, required: true },
   endingdate: { type: Date, index: true, required: true },
   status: { type: String, enum: ['active', 'inactive'], default: 'active', required: true  },

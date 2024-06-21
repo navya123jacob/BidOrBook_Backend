@@ -63,6 +63,10 @@ class AdminRepository implements IAdminRepo {
   async unblockUser(userId: string): Promise<User | null> {
     return await UserModel.findByIdAndUpdate(userId, { is_blocked: false }, { new: true });
   }
+  async getAdminDetails(): Promise<Admin | null> {
+    const admin = await AdminModel.findOne();
+    return admin;
+  }
   
 }
 

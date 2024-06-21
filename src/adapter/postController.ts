@@ -20,7 +20,8 @@ class PostController implements IPostController {
         userid,
         name,
         description,
-        is_blocked:false
+        is_blocked:false,
+        spam:[]
       };
       if (req.file) {
         try {

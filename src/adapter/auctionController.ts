@@ -41,6 +41,8 @@ class AuctionController implements IAuctionController {
           pincode: 0,
           phonenumber:0,
         },
+        spam:[],
+        bids:[]
       };
 
       if (req.file) {
@@ -277,6 +279,7 @@ class AuctionController implements IAuctionController {
   async getAllAuctionsWithUserDetails(req: Request, res: Response): Promise<void> {
     try {
       const auctions = await this.auctionUseCase.getAllAuctionsWithUserDetails();
+      
       res.status(200).json({ auctions });
     } catch (error) {
       console.error('Error fetching auctions with user details:', error);

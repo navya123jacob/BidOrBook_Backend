@@ -9,6 +9,7 @@ interface IAdminRepo {
   getAllUsers(): Promise<User[]>;
   blockUser(userId: string): Promise<User | null>;
   unblockUser(userId: string): Promise<User | null>;
+  getAdminDetails(): Promise<Admin | null>
 }
 
 export default IAdminRepo;

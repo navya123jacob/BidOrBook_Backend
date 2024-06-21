@@ -15,7 +15,8 @@ interface IUserController {
   singleUserPost(req: Request, res: Response): Promise<void>;
   SingleUser(req: Request, res: Response): Promise<void>;
   spamUser(req: Request, res: Response): Promise<void>;
-  unspamUser(req: Request, res: Response): Promise<void>
+  unspamUser(req: Request, res: Response): Promise<void>;
+  getWalletValue(req: Request, res: Response): Promise<void>
   
 }
 

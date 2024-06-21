@@ -1,6 +1,6 @@
 import express from "express";
 import { userController, postController, bookingController, messageController, auctionController } from "./injection"; 
-import { protect } from "../../middlewares/userAuth";
+import { protect} from "../../middlewares/userAuth";
 import upload from "../../utils/Multer";
 
 // Initialize router
@@ -23,15 +23,14 @@ router.get('/logout', protect, (req, res) => userController.logout(req, res));
 router.get('/SingleUser/:id', protect, (req, res) => userController.SingleUser(req, res));
 router.post("/spam/:id", protect, (req, res) => userController.spamUser(req, res));
 router.post('/unspam/:id',protect,(req, res) => userController.unspamUser(req, res));
+router.get("/user/:userId/wallet",protect, (req, res) => userController.getWalletValue(req, res));
 
 // Post routes
 router.post('/createpost', protect, upload.single('image'), (req, res) => postController.createPost(req, res));
 router.delete('/deletepost', protect, (req, res) => postController.deletePost(req, res));
 router.post('/postsspam/:id', protect, (req, res) => postController.markPostAsSpam(req, res));
 router.post('/postsunspam/:id', protect, (req, res) => postController.UnmarkPostAsSpam(req, res));
-router.get('/posts-with-spam',protect, (req, res) => postController.getPostsWithSpam(req, res));
-router.post('/:postId/block',protect, (req, res) =>  postController.blockPost(req, res));
-router.post('/:postId/unblock',protect, (req, res) =>  postController.unblockPost(req, res));
+
 
 // Booking routes
 router.post('/checkavailability', protect, (req, res) => bookingController.checkAvailability(req, res));
@@ -69,6 +68,6 @@ router.post('/wallet-payment-auction', protect, (req, res) => auctionController.
 router.post('/auctions-by-bidder',protect,(req, res) => auctionController.getAuctionsByBidder(req, res));
 router.post('/auction/spam',protect,(req, res) => auctionController.addSpam(req, res));
 router.post('/auction/spam/remove',protect,(req, res) => auctionController.removeSpam(req, res));
-router.get('/auctions/user-details',protect,(req, res) => auctionController.getAllAuctionsWithUserDetails(req, res));
+
 
 export default router;

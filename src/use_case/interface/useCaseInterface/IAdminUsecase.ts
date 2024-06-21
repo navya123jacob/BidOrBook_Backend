@@ -7,6 +7,7 @@ interface IAdminUseCase {
   blockUser(userId: string): Promise<User | null>;
   unblockUser(userId: string): Promise<User | null>;
   updateAdmin(_id: string, updateData: Partial<Admin>): Promise<Admin | null>;
+  getAdminDetails(): Promise<Admin | null>
 }
 
 export default IAdminUseCase;

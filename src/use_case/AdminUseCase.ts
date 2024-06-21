@@ -55,6 +55,9 @@ class AdminUseCase implements IAdminUseCase {
   async updateAdmin(_id: string, updateData: Partial<Admin>): Promise<Admin | null> {
     return await this.adminRepo.findOneAndUpdate(_id, updateData);
   }
+  async getAdminDetails(): Promise<Admin | null> {
+    return await this.adminRepo.getAdminDetails();
+  }
 }
 
 export default AdminUseCase;

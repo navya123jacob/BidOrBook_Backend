@@ -131,6 +131,19 @@ class AdminController implements IAdminController {
       res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
   }
+  async getAdminDetails(req: Request, res: Response): Promise<void> {
+    try {
+      const admin = await this.adminUseCase.getAdminDetails();
+      
+      if (admin) {
+        res.status(200).json(admin);
+      } else {
+        res.status(404).json({ message: "Admin not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "An error occurred", error });
+    }
+  }
 }
 
 export default AdminController;

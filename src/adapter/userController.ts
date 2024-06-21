@@ -168,7 +168,11 @@ class UserController implements IUserController {
   async login(req: Request, res: Response): Promise<void> {
     try {
       const user = await this.userCase.login(req.body);
-      if (user) {
+      if(user.status==400 && user.data.message=='You have been blocked by admin!'){
+        res.status(400).json(user.data);
+      }
+      
+      else if (user) {
         const id = (user?.data?.message as User)?._id.toHexString();
         await this.userCase.saveRefreshToken(id, user.data.refreshToken);
         
@@ -327,6 +331,15 @@ async unspamUser(req: Request, res: Response): Promise<void>{
     res.status(200).json({ message: "User unspammed successfully", result });
   } catch (error) {
     res.status(500).json({ message: "Error unspamming user", error });
+  }
+}
+async getWalletValue(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.userId;
+    const walletValue = await this.userCase.getUserWallet(userId);
+    res.status(200).json({ wallet: walletValue });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
   }
 }
 }

@@ -137,6 +137,10 @@ class AuctionRepository implements IAuctionRepo {
         path: 'bids.userId', 
         model: 'User', 
       })
+      .populate({
+        path: 'spam.userId', 
+        model: 'User', 
+      })
       .exec();
   }
   

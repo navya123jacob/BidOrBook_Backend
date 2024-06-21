@@ -295,6 +295,13 @@ async spamUser(userId: Types.ObjectId, spamInfo: { userId: Types.ObjectId, reaso
 async unspamUserUseCase(userId: string,id: string): Promise<User|null>{
   return await this.userRepository.unspamUserRepository(userId,id);
 };
+async getUserWallet(userId: string): Promise<number> {
+  const user = await this.userRepository.findById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return user.wallet;
+}
 
 }
 
