@@ -24,6 +24,10 @@ router.get('/SingleUser/:id', protect, (req, res) => userController.SingleUser(r
 router.post("/spam/:id", protect, (req, res) => userController.spamUser(req, res));
 router.post('/unspam/:id',protect,(req, res) => userController.unspamUser(req, res));
 router.get("/user/:userId/wallet",protect, (req, res) => userController.getWalletValue(req, res));
+router.post('/user/:id/review',protect, (req, res) => userController.addReceivedReview(req, res));
+router.delete('/user/:id/review',protect,(req, res) => userController.removeReceivedReview(req, res));
+router.get('/user/:id/reviews',protect,(req, res) => userController.getUserReviews(req, res));
+
 
 // Post routes
 router.post('/createpost', protect, upload.single('image'), (req, res) => postController.createPost(req, res));

@@ -17,6 +17,9 @@ interface IUserRepo {
     updateWalletCancel(id: string, amount: number): Promise<User | null>;
     spamUser(userId: Types.ObjectId, spamInfo: { userId: Types.ObjectId, reason: string }): Promise<User | null>;
     unspamUserRepository (userId: string,id:string):Promise<User|null>;
+    addReceivedReview(userId: string, review: { userId: Types.ObjectId, stars: number, review: string }): Promise<User | null>;
+    removeReceivedReview(userId: string, reviewUserId: string): Promise<User | null>;
+    getUserReviews(userId: string): Promise<User | null>
 }
 
 export default IUserRepo;

@@ -6,19 +6,16 @@ const userSchema: Schema<User & Document> = new mongoose.Schema({
     Fname: { type: String, required: true },
     Lname: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    location: { 
-        state: { type: String, default:'' },
-        district: { type: String, default:'' },
-        country: { type: String, default:''}
-    },  
+    location: {
+        state: { type: String, default: '' },
+        district: { type: String, default: '' },
+        country: { type: String, default: '' }
+    },
     phone: { type: Number, default: 0 },
     password: { type: String, default: "" },
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post', default: [] }],
     auction: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Auction', default: [] }],
     category: { type: String, enum: ['Photographer', 'Artist'], default: "Photographer" },
-    receivedReviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review', default: [] }],
-    givenReviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review', default: [] }],
-    purchasedItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'PurchasedItem', default: [] }],
     bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Booking', default: [] }],
     is_verified: { type: Boolean, default: false },
     is_google: { type: Boolean, default: false },
@@ -33,7 +30,14 @@ const userSchema: Schema<User & Document> = new mongoose.Schema({
     spam: [{
         userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         reason: { type: String, required: true }
-    }]
+    }],
+    receivedReviews: [{
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        stars: { type: Number, required: true },
+        review:{ type: String, required: true }
+    }],
+    minPayPerHour: { type: Number, default: 0 },
+    typesOfEvents: [{ type: String }]
 });
 
 const UserModel: Model<User & Document> = mongoose.model<User & Document>('User', userSchema);

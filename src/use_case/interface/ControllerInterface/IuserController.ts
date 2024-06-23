@@ -16,7 +16,10 @@ interface IUserController {
   SingleUser(req: Request, res: Response): Promise<void>;
   spamUser(req: Request, res: Response): Promise<void>;
   unspamUser(req: Request, res: Response): Promise<void>;
-  getWalletValue(req: Request, res: Response): Promise<void>
+  getWalletValue(req: Request, res: Response): Promise<void>;
+  addReceivedReview(req: Request, res: Response): Promise<void>;
+  removeReceivedReview(req: Request, res: Response): Promise<void>;
+  getUserReviews(req: Request, res: Response): Promise<void>;
   
 }
 

@@ -100,7 +100,7 @@ class AuctionRepository implements IAuctionRepo {
     }
   }
   async getAuctionsByBidder(clientId: string): Promise<IAuction[]> {
-    return AuctionModel.find({ 'bids.userId': clientId }).exec();
+    return AuctionModel.find({ 'bids.userId': clientId }) .sort({ endingdate: -1 }).exec();
   }
   
   async addSpam(auctionId: string, userId: string, reason: string): Promise<IAuction | null> {

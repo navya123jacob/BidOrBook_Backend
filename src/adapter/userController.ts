@@ -342,6 +342,39 @@ async getWalletValue(req: Request, res: Response): Promise<void> {
     res.status(500).json({ error: (error as Error).message });
   }
 }
+async addReceivedReview(req: Request, res: Response): Promise<void> {
+  try {
+    const { userId, stars, review } = req.body;
+    const reviewData = {
+      userId: new Types.ObjectId(userId),
+      stars,
+      review
+    };
+    const updatedUser = await this.userCase.addReceivedReview(req.params.id, reviewData);
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+}
+async removeReceivedReview(req: Request, res: Response): Promise<void> {
+  try {
+    const { reviewUserId } = req.body;
+    const updatedUser = await this.userCase.removeReceivedReview(req.params.id, reviewUserId);
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+}
+
+async getUserReviews(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.params.id;
+    const userReviews = await this.userCase.getUserReviews(userId);
+    res.status(200).json(userReviews);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+}
 }
 
 export default UserController;

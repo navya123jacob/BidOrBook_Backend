@@ -45,7 +45,7 @@ export class BookingController implements BookingControllerInterface {
 
   async getBookingsreq(req: Request, res: Response): Promise<void> {
     try {
-      const { artistId,clientId, len } = req.body;
+      const { artistId,clientId, clientside } = req.body;
       // if (!artistId) {
       //   res.status(400).json({ message: 'artistId is required' });
       //   return;

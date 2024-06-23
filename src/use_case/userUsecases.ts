@@ -302,6 +302,15 @@ async getUserWallet(userId: string): Promise<number> {
   }
   return user.wallet;
 }
+async addReceivedReview(userId: string, review: { userId: Types.ObjectId, stars: number, review: string }): Promise<User | null> {
+  return this.userRepository.addReceivedReview(userId, review);
+}
+async removeReceivedReview(userId: string, reviewUserId: string): Promise<User | null> {
+  return this.userRepository.removeReceivedReview(userId, reviewUserId);
+}
+async getUserReviews(userId: string): Promise<User | null> {
+  return this.userRepository.getUserReviews(userId);
+}
 
 }
 

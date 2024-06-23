@@ -93,7 +93,7 @@ async findOneAndUpdate(_id: Types.ObjectId | string, update: Partial<User>): Pro
 
   async getAllPosts(filters: { userid?: string; category?: string; usernotid?: string;searchPlaceholder?: string}): Promise<any> {
     try {
-      const query: any = {};
+      const query: any = {is_blocked:false};
       
       if (filters.category) {
         query.category = filters.category;
@@ -214,6 +214,37 @@ async  unspamUserRepository (userId: string,id:string): Promise<User|null> {
   }
   return user;
 };
+async addReceivedReview(userId: string, review: { userId: Types.ObjectId, stars: number, review: string }): Promise<User | null> {
+  const user = await UserModel.findById(userId);
+  
+  if (user) {
+    user.receivedReviews.push(review);
+    await user.save();
+    return user;
+  } else {
+    throw new Error('User not found');
+  }
+}
+async removeReceivedReview(userId: string, reviewUserId: string): Promise<User | null> {
+  const user = await UserModel.findById(userId);
+
+  if (user) {
+    user.receivedReviews = user.receivedReviews.filter(review => {return review.userId.toString() !== reviewUserId});
+    await user.save();
+    return user;
+  } else {
+    throw new Error('User not found');
+  }
+}
+async getUserReviews(userId: string): Promise<User | null> {
+  const user = await UserModel.findById(userId).populate('receivedReviews.userId');
+  if (user) {
+    return user;
+  } else {
+    throw new Error('User not found');
+  }
+}
+
   
 }
 

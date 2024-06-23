@@ -14,6 +14,7 @@ import { Types } from 'mongoose';
         date_of_booking: { $elemMatch: { $gte: startDate, $lte: endDate } }
       };
       
+      
       if (bookingId) {
         query._id = { $ne: bookingId };
       }
@@ -61,7 +62,14 @@ import { Types } from 'mongoose';
 
   async getBookingsByArtistId(artistId: string,clientId:string): Promise<Booking[]> {
     try {let bookings;
-      if(artistId){
+      if(clientId &&  artistId){
+        bookings = await BookingModel.find({
+          artistId,
+          clientId,
+          status: { $in: ['pending', 'confirmed'] }
+        }).populate('clientId').exec();
+      }
+      else if(artistId){
        bookings = await BookingModel.find({
         artistId,
         status: { $in: ['pending', 'confirmed'] }
@@ -82,7 +90,14 @@ import { Types } from 'mongoose';
 
   async getBookingsByArtistIdConfirm(artistId: string,clientId:string): Promise<Booking[]> {
     try {let bookings;
-      if(artistId){
+      if(clientId &&  artistId){
+        bookings = await BookingModel.find({
+          artistId,
+          clientId,
+          status: 'booked'
+        }).populate('clientId').exec();
+      }
+      else if(artistId){
        bookings = await BookingModel.find({ artistId, status: 'booked' }).populate('clientId').exec();}
        else{
         bookings = await BookingModel.find({ clientId, status: 'booked' }).populate('artistId').exec();}
@@ -95,7 +110,14 @@ import { Types } from 'mongoose';
 
   async getBookingsByArtistIdMarked(artistId: string,clientId:string): Promise<Booking[]> {
     try {let bookings;
-      if(artistId){
+      if(clientId &&  artistId){
+        bookings = await BookingModel.find({
+          artistId,
+          clientId,
+          status: 'marked'
+        }).populate('clientId').exec();
+      }
+      else if(artistId){
        bookings = await BookingModel.find({ artistId, status: 'marked' }).populate('clientId').exec();}
        else{
         bookings = await BookingModel.find({ clientId, status: 'marked' }).populate('artistId').exec();}
