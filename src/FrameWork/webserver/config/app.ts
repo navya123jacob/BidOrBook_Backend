@@ -33,7 +33,7 @@ app.use('/admin', adminRoute);
 
 // Fallback route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
-    res.status(404).json({ 'error': 'Not Found' });
+    res.json({ 'error': 'Not Found' });
 });
 
 export default app;
