@@ -2,7 +2,7 @@ import mongoose, { Schema, model, Document, Types } from "mongoose";
 import { Booking } from "../../Domain/Booking";
 
 const bookingSchema = new Schema<Booking>({
-  status: { type: String, required: true, enum: ['pending', 'confirmed','marked','booked'],default:'pending' },
+  status: { type: String, required: true, enum: ['pending', 'confirmed','marked','booked','done'],default:'pending' },
   clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   artistId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   location: {

@@ -24,6 +24,7 @@ class AuctionRepository implements IAuctionRepo {
     if (userId!='1') {
       query.userId = userId;
       
+      
     }else {
       query.userId = { $ne: notId };
       query.status='active'

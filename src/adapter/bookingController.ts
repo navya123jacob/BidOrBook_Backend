@@ -76,10 +76,6 @@ export class BookingController implements BookingControllerInterface {
   async getMarked(req: Request, res: Response): Promise<void> {
     try {
       const { artistId,clientId, len } = req.body;
-      // if (!artistId) {
-      //   res.status(400).json({ message: 'artistId is required' });
-      //   return;
-      // }
 
       const result = await this.bookingUseCase.getMarked(artistId as string,clientId as string);
       res.json(result);
@@ -234,7 +230,6 @@ async handleWebhook(req: Request, res: Response): Promise<void> {
 
     const { bookingId,auctionId,addressline,district,state,country,pincode,phonenumber } = metadata;
 
-    console.log('Payment successful for Booking ID:', bookingId);
     if(bookingId){
     await this.bookingUseCase.handleSuccessfulPayment(bookingId);}
     if(auctionId){
