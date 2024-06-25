@@ -13,7 +13,7 @@ class AdminJWTToken implements JWT {
   }
 
   generateRefreshToken(userId: string): string {
-    const refreshKey = process.env.REFRESH_TOKEN_SECRET || "refresh123456";
+    const refreshKey = process.env.ADMIN_REFRESH_TOKEN_SECRET || "refresh123456";
     const expiresIn = '30d'; // 30 days
     if (refreshKey) {
       const refreshToken: string = jwt.sign({ userId }, refreshKey, { expiresIn });
