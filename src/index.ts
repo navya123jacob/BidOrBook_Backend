@@ -5,6 +5,7 @@ import { initializeSocket } from "./FrameWork/utils/Soket";
 import http from 'http';
 
 const port = process.env.PORT || 3000; 
+const frontendUrl = process.env.official || process.env.local;
 const server = http.createServer(app);
 
 const io = initializeSocket(server);
@@ -13,8 +14,10 @@ const start = async () => {
     try {
         await connectDb(); 
         server.listen(port, () => { 
-            console.log(`Server started on http://localhost:${port}`);
+            console.log(`Server started on ${frontendUrl}:${port}`);
         });
+
+        console.log(`Frontend URL: ${frontendUrl}`);
     } catch (error) {
         console.error('Failed to connect to the database', error);
         process.exit(1); 

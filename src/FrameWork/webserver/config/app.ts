@@ -11,18 +11,18 @@ import '../../utils/updateAuctionStatus'
 const app: Express = express();
 
 app.use(cookieParser());
-app.use(cors({
-    origin: process.env.local,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    optionsSuccessStatus: 204
-}));
 // app.use(cors({
-//     origin: 'https://bid-or-book.vercel.app',
+//     origin: process.env.local,
 //     credentials: true,
 //     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 //     optionsSuccessStatus: 204
 // }));
+app.use(cors({
+    origin: process.env.official,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    optionsSuccessStatus: 204
+}));
 
 app.use(express.static(path.join(__dirname, '../public')));
 
