@@ -10,7 +10,7 @@ import { Types } from 'mongoose';
     try {
       const query: any = {
         artistId: artistId,
-        status: 'booked',
+        status: { $in: ['booked', 'done'] },
         date_of_booking: { $elemMatch: { $gte: startDate, $lte: endDate } }
       };
       
@@ -67,18 +67,18 @@ import { Types } from 'mongoose';
           artistId,
           clientId,
           status: { $in: ['pending', 'confirmed'] }
-        }).populate('clientId').exec();
+        }).populate('clientId').populate('artistId').exec();
       }
       else if(artistId){
        bookings = await BookingModel.find({
         artistId,
         status: { $in: ['pending', 'confirmed'] }
-      }).populate('clientId').exec();}
+      }).populate('clientId').populate('artistId').exec();}
       else{
         bookings = await BookingModel.find({
           clientId,
           status: { $in: ['pending', 'confirmed'] }
-        }).populate('artistId').exec();
+        }).populate('artistId').populate('clientId').exec();
       }
       
       return bookings;
@@ -95,12 +95,12 @@ import { Types } from 'mongoose';
           artistId,
           clientId,
           status: 'booked'
-        }).populate('clientId').exec();
+        }).populate('clientId').populate('artistId').exec();;
       }
       else if(artistId){
-       bookings = await BookingModel.find({ artistId, status: 'booked' }).populate('clientId').exec();}
+       bookings = await BookingModel.find({ artistId, status: 'booked' }).populate('clientId').populate('artistId').exec();}
        else{
-        bookings = await BookingModel.find({ clientId, status: 'booked' }).populate('artistId').exec();}
+        bookings = await BookingModel.find({ clientId, status: 'booked' }).populate('clientId').populate('artistId').exec();}
       return bookings;
     } catch (error) {
       console.error('Error getting bookings by artist ID:', error);
@@ -115,12 +115,31 @@ import { Types } from 'mongoose';
           artistId,
           clientId,
           status: 'marked'
-        }).populate('clientId').exec();
+        }).populate('clientId').populate('artistId').exec();
       }
       else if(artistId){
-       bookings = await BookingModel.find({ artistId, status: 'marked' }).populate('clientId').exec();}
+       bookings = await BookingModel.find({ artistId, status: 'marked' }).populate('clientId').populate('artistId').exec();;}
        else{
-        bookings = await BookingModel.find({ clientId, status: 'marked' }).populate('artistId').exec();}
+        bookings = await BookingModel.find({ clientId, status: 'marked' }).populate('clientId').populate('artistId').exec();}
+      return bookings;
+    } catch (error) {
+      console.error('Error getting bookings by artist ID:', error);
+      throw new Error('Failed to get bookings');
+    }
+  }
+  async getBookingsByArtistIdDone(artistId: string,clientId:string): Promise<Booking[]> {
+    try {let bookings;
+      if(clientId &&  artistId){
+        bookings = await BookingModel.find({
+          artistId,
+          clientId,
+          status: 'done'
+        }).populate('clientId').populate('artistId').exec();
+      }
+      else if(artistId){
+       bookings = await BookingModel.find({ artistId, status: 'done' }).populate('clientId').populate('artistId').exec();}
+       else{
+        bookings = await BookingModel.find({ clientId, status: 'done' }).populate('clientId').populate('artistId').exec();}
       return bookings;
     } catch (error) {
       console.error('Error getting bookings by artist ID:', error);
@@ -156,6 +175,7 @@ import { Types } from 'mongoose';
     amount:number
   ): Promise<Booking> {
     try {
+      
       const updatedBooking = await BookingModel.findByIdAndUpdate(
         _id,
         { event, location, date_of_booking, status,amount },
@@ -208,7 +228,7 @@ import { Types } from 'mongoose';
     try {
       const updatedBooking = await BookingModel.findByIdAndUpdate(
         bookingId,
-        { status,payment_method:'wallet' },
+        { status,payment_method:'wallet',payment_date:Date.now() },
         { new: true }
       ).exec();
 

@@ -232,6 +232,15 @@ class UserController implements IUserController {
         phone: req.body.phone,
         description: req.body.description
       };
+      if(req.body.state && req.body.district && req.body.country){
+        updateData.location={'district':req.body.district,
+          'state':req.body.state,
+          'country':req.body.country
+        }
+      }
+      if(req.body.minPayPerHour){
+        updateData.minPayPerHour=req.body.minPayPerHour
+      }
 
       if (req.body.password) {
         updateData.password = req.body.password;

@@ -83,6 +83,16 @@ export class BookingController implements BookingControllerInterface {
       res.status(500).json({ message: 'Internal server error' });
     }
   }
+  async getBookingsDone(req: Request, res: Response): Promise<void> {
+    try {
+      const { artistId,clientId, len } = req.body;
+
+      const result = await this.bookingUseCase.getDone(artistId as string,clientId as string);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
 
   async getSingleBooking(req: Request, res: Response): Promise<void> {
     try {
@@ -123,23 +133,31 @@ async cancelBooking(req: Request, res: Response): Promise<void> {
   }
 }
 
+
 async updateBooking(req: Request, res: Response): Promise<void> {
   try {
-    const { _id, event, location, date_of_booking,amount } = req.body;
+    const { _id, event, location, date_of_booking,amount,done } = req.body;
 
-    if (!_id || !event || !location || !date_of_booking ||!amount) {
-      res.status(400).json({ message: 'Missing required fields' });
-      return;
-    }
-
-    const updatedBooking = await this.bookingUseCase.updateBooking(
+    let updatedBooking;
+     if(!done){
+    updatedBooking = await this.bookingUseCase.updateBooking(
       _id,
       event,
       location,
       date_of_booking,
       'confirmed',
       amount
-    );
+    );}
+    else{
+      updatedBooking = await this.bookingUseCase.updateBooking(
+        _id,
+        event,
+        location,
+        date_of_booking,
+        'done',
+        amount
+      );
+    }
 
     res.status(200).json(updatedBooking);
   } catch (error) {

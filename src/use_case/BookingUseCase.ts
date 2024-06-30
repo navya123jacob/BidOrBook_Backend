@@ -37,6 +37,13 @@ export class BookingUseCase implements IBookingUseCase {
         
         return { bookings };
     }
+    async getDone(artistId: string,clientId:string): Promise< { bookings: Booking[] }> {
+      let bookings
+      
+        bookings = await this.bookingRepository.getBookingsByArtistIdDone(artistId,clientId)
+        
+        return { bookings };
+    }
 
     async singleBooking(artistId: string,clientId: string): Promise<Booking|null> { 
         try {
@@ -67,6 +74,7 @@ export class BookingUseCase implements IBookingUseCase {
     
         booking.status = 'booked'; 
         booking.payment_method='stripe'
+        booking.payment_date = new Date(Date.now());
         await this.bookingRepository.updateBookingStripe(booking);
       }
       async updateBookingStatus(bookingId: string, status: string): Promise<Booking> {

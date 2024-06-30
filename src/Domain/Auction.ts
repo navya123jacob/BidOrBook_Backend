@@ -23,6 +23,7 @@ export interface IAuction extends Document {
   initial: number;
   paymentmethod: 'wallet' | 'stripe' | '';
   payment: 'pending' | 'paid';
+  payment_date: Date;
   address: {
     addressline: string;
     district: string;

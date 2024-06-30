@@ -14,5 +14,6 @@ export interface IBookingUseCase {
     handleSuccessfulPayment(sessionId: string): Promise<void>;
     updateBookingStatus(bookingId: string, status: string): Promise<Booking>;
     findAvailablePeople(startDate: Date, endDate: Date,category:string,usernotid:string): Promise<User[]>;
-    getAllBookingsByArtistAndClient(): Promise<Booking[]>
+    getAllBookingsByArtistAndClient(): Promise<Booking[]>;
+    getDone(artistId: string,clientId:string): Promise< { bookings: Booking[] }>
 }

@@ -1,4 +1,4 @@
-require('dotenv').config();
+
 import app from "./FrameWork/webserver/config/app";
 import connectDb from "./FrameWork/webserver/config/db";
 import { initializeSocket } from "./FrameWork/utils/Soket";

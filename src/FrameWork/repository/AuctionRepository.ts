@@ -86,7 +86,7 @@ class AuctionRepository implements IAuctionRepo {
     try {
       const updatedAuction = await AuctionModel.findByIdAndUpdate(
         auctionId,
-        { paymentmethod:'wallet',payment:'paid',address },
+        { paymentmethod:'wallet',payment:'paid',address,payment_date:Date.now() },
         { new: true }
       ).exec();
 

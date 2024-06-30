@@ -42,6 +42,7 @@ class AuctionUseCase implements IAuctionUseCase {
     auction.payment = 'paid'; 
     auction.paymentmethod='stripe'
     auction.address=address
+    auction.payment_date= new Date(Date.now());
     await this.auctionRepo.updateAuctionStripe(auction);
   }
   async updateAuctionWallet(AuctionId: string,address:Address): Promise<IAuction> {
