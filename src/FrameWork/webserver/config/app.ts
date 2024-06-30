@@ -18,7 +18,7 @@ app.use(cookieParser());
 //     optionsSuccessStatus: 204
 // }));
 app.use(cors({
-    origin: process.env.official,
+    origin: process.env.backend,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     optionsSuccessStatus: 204

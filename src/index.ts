@@ -5,7 +5,7 @@ import { initializeSocket } from "./FrameWork/utils/Soket";
 import http from 'http';
 
 const port = process.env.PORT || 3000; 
-const frontendUrl = process.env.official || process.env.local;
+const frontendUrl = process.env.backend || process.env.local;
 const server = http.createServer(app);
 
 const io = initializeSocket(server);
