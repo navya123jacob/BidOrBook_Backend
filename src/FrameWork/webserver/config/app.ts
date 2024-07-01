@@ -1,4 +1,3 @@
-require('dotenv').config();
 import express, { Express, NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import cors from 'cors';
@@ -9,21 +8,15 @@ import { bookingController } from "../routes/injection";
 import '../../utils/updateAuctionStatus'
 
 const app: Express = express();
-
+let local=process.env.local as string
+let frontend=process.env.frontend as string
 app.use(cookieParser());
-// app.use(cors({
-//     origin: process.env.local,
-//     credentials: true,
-//     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-//     optionsSuccessStatus: 204
-// }));
 app.use(cors({
-    origin: process.env.frontend,
+    origin: [local,frontend],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     optionsSuccessStatus: 204
 }));
-
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
@@ -41,7 +34,7 @@ app.use('/admin', adminRoute);
 
 // Fallback route
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
-    res.json({ 'error': 'Not Found' });
+    res.status(404).json({ 'error': 'Not Found' });
 });
 
 export default app;
