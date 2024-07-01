@@ -12,10 +12,14 @@ let local=process.env.local as string
 let frontend=process.env.frontend as string
 console.log('Local:', process.env.local);
 console.log('Frontend:', process.env.frontend);
+app.use((req: Request, res: Response, next: NextFunction) => {
+    console.log(`${req.method} request for '${req.url}'`);
+    next();
+});
 
 app.use(cookieParser());
 app.use(cors({
-    origin: [local,'https://bid-or-book.vercel.app'],
+    origin: [local,frontend],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     optionsSuccessStatus: 204
