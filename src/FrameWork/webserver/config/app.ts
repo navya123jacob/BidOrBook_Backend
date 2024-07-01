@@ -15,7 +15,7 @@ console.log('Frontend:', process.env.frontend);
 
 app.use(cookieParser());
 app.use(cors({
-    origin: [local,frontend],
+    origin: [local,'https://bid-or-book.vercel.app'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     optionsSuccessStatus: 204
