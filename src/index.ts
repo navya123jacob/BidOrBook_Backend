@@ -13,7 +13,7 @@ const start = async () => {
     try {
         await connectDb(); 
         server.listen(port, () => { 
-            console.log(`Server started on http://localhost:${port}`);
+            console.log(`Server started on yayy http://localhost:${port}`);
         });
     } catch (error) {
         console.error('Failed to connect to the database', error);

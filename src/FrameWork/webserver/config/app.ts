@@ -10,6 +10,9 @@ import '../../utils/updateAuctionStatus'
 const app: Express = express();
 let local=process.env.local as string
 let frontend=process.env.frontend as string
+console.log('Local:', process.env.local);
+console.log('Frontend:', process.env.frontend);
+
 app.use(cookieParser());
 app.use(cors({
     origin: [local,frontend],
