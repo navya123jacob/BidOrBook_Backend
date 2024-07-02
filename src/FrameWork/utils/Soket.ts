@@ -18,13 +18,25 @@ export class ServerSocket {
         ServerSocket.instance = this;
         this.users = {};
         this.rooms = {};
+        // this.io = new Server(server, {
+        //     serveClient: false,
+        //     pingInterval: 10000,
+        //     pingTimeout: 5000,
+        //     cookie: false,
+        //     cors: {
+        //         origin: '*'
+        //     }
+        // });
         this.io = new Server(server, {
             serveClient: false,
             pingInterval: 10000,
             pingTimeout: 5000,
             cookie: false,
             cors: {
-                origin: '*'
+                origin: ['https://bid-or-book.vercel.app'], // Add specific allowed origins here
+                methods: ['GET', 'POST'],
+                allowedHeaders: ['Content-Type'],
+                credentials: true
             }
         });
 

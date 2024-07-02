@@ -14,11 +14,16 @@ console.log('Local:', process.env.local);
 console.log('Frontend:', process.env.frontend);
 
 app.use(cookieParser());
+// app.use(cors({
+//     origin: [local,frontend],
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+//     optionsSuccessStatus: 204
+// }));
 app.use(cors({
-    origin: [local,frontend],
+    origin: 'https://bid-or-book.vercel.app',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    optionsSuccessStatus: 204
+    
 }));
 app.use(express.static(path.join(__dirname, '../public')));
 
