@@ -134,7 +134,7 @@ class AdminController implements IAdminController {
   async getAdminDetails(req: Request, res: Response): Promise<void> {
     try {
       const admin = await this.adminUseCase.getAdminDetails();
-      console.log(admin)
+      console.log(admin,'admin')
       if (admin) {
         res.status(200).json(admin);
       } else {
