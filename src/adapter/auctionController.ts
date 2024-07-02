@@ -160,9 +160,9 @@ class AuctionController implements IAuctionController {
       const { auctionId, amount, artistId, clientId,address } = req.body;
   console.log(address)
       
-      const successUrl = `http://localhost:5173/artpho/auction?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
+      const successUrl = `https://bid-or-book.vercel.app/artpho/auction?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
       
-      const cancelUrl = `http://localhost:5173/artpho/auction?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `https://bid-or-book.vercel.app/artpho/auction?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
   
       const session = await this.stripe.checkout.sessions.create({
         payment_method_types: ['card'],
