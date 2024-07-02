@@ -30,7 +30,7 @@ export class ServerSocket {
         this.io = new Server(server, {
             cors: {
                 origin: ['https://bid-or-book.vercel.app'], 
-                credentials: true
+                
             },
         });
       
