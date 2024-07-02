@@ -1,21 +1,19 @@
-// ecosystem.config.js
 
 module.exports = {
-    apps : [{
-      name: 'backend',
-      script: 'dist/index.js', // Replace with your compiled entry point
-      instances: 'max',
-      autorestart: true,
-      watch: false,
-      max_memory_restart: '1G',
-      env: {
-        NODE_ENV: 'production',
-        PORT: 8888, 
-      },
-      env_production: {
-        NODE_ENV: 'production',
-        PORT: 8888, 
-      }
-    }]
-  };
-  
+    apps: [
+        {
+            name: 'backend',
+            script: './src/index.ts',
+            watch: true,
+            ignore_watch: ['node_modules', 'logs'],
+            instances: 1,
+            exec_mode: 'fork',
+            autorestart: true,
+            max_restarts: 10,
+            env: {
+                NODE_ENV: 'production',
+                PORT: 3000,
+            },
+        },
+    ],
+};
