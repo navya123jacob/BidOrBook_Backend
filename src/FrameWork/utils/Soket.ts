@@ -29,11 +29,12 @@ export class ServerSocket {
         // });
         this.io = new Server(server, {
             cors: {
-                origin: ['https://bid-or-book.vercel.app'], 
-                
-            },
+                origin: ['https://bid-or-book.vercel.app'], // Add specific allowed origins here
+                methods: ['GET', 'POST'],
+                allowedHeaders: ['Content-Type'],
+                credentials: true
+            }
         });
-      
 
         this.io.on('connect', this.StartListeners);
     }
