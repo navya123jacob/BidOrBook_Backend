@@ -21,8 +21,9 @@ app.use(cookieParser());
 //     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 //     optionsSuccessStatus: 204
 // }));
+const frontendUrl = process.env.frontend || '';
 app.use(cors({
-    origin: ['https://bid-or-book.vercel.app','http://localhost:5173'],
+    origin: [frontendUrl,'http://localhost:5173'],
     credentials: true,
     
 }));

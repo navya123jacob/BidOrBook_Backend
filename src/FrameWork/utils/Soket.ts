@@ -32,9 +32,10 @@ export class ServerSocket {
         //         origin: '*'
         //     }
         // });
+        const frontendUrl = process.env.frontend || '';
         this.io = new Server(server, {
             cors: {
-                origin:['http://localhost:5173',],
+                origin:['http://localhost:5173',frontendUrl],
                 methods: ['GET', 'POST'],
                 allowedHeaders: ['Content-Type'],
                 credentials: true
