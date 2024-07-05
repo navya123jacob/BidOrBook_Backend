@@ -238,6 +238,9 @@ class UserController implements IUserController {
           'country':req.body.country
         }
       }
+      if(req.body.typesOfEvents){
+        updateData.typesOfEvents=req.body.typesOfEvents
+      }
       if(req.body.minPayPerHour){
         updateData.minPayPerHour=req.body.minPayPerHour
       }

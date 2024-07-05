@@ -3,6 +3,7 @@ import IAdminUseCase from '../use_case/interface/useCaseInterface/IAdminUsecase'
 import { Admin } from '../Domain/Admin';
 import IAdminController from '../use_case/interface/ControllerInterface/IAdminController';
 import { cloudinary } from '../FrameWork/utils/CloudinaryConfig';
+import { IEvent } from '../Domain/Event';
 class AdminController implements IAdminController {
   private adminUseCase: IAdminUseCase;
 
@@ -134,7 +135,7 @@ class AdminController implements IAdminController {
   async getAdminDetails(req: Request, res: Response): Promise<void> {
     try {
       const admin = await this.adminUseCase.getAdminDetails();
-      console.log(admin,'admin')
+      
       if (admin) {
         res.status(200).json(admin);
       } else {
@@ -144,6 +145,36 @@ class AdminController implements IAdminController {
       res.status(500).json({ message: "An error occurred", error });
     }
   }
+  async getEvents(req: Request, res: Response): Promise<void> {
+    try {
+      const { type } = req.params;
+      const events = await this.adminUseCase.getEvents(type);
+      
+      res.status(200).json(events);
+    } catch (error: any) {
+      res.status(500).json({ status: false, message: error.message });
+    }
+  }
+
+  async deleteEvent(req: Request, res: Response): Promise<void> {
+    try {
+      const { eventId } = req.params;
+      await this.adminUseCase.deleteEvent(eventId);
+      res.status(200).json({ status: true, message: 'Event deleted successfully' });
+    } catch (error: any) {
+      res.status(500).json({ status: false, message: error.message });
+    }
+  }
+  async createEvent(req: Request, res: Response): Promise<void> {
+    try {
+      const eventData: IEvent = req.body;
+      const newEvent = await this.adminUseCase.createEvent(eventData);
+      res.status(201).json(newEvent);
+    } catch (error: any) {
+      res.status(500).json({ status: false, message: error.message });
+    }
+  }
+
 }
 
 export default AdminController;

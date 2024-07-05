@@ -47,6 +47,7 @@ export const protectAdmin = async (req: Request, res: Response, next: NextFuncti
 
         try {
           const decodedRefresh = jwt.verify(refreshToken, process.env.ADMIN_REFRESH_TOKEN_SECRET as string) as JwtPayload;
+          
           const admin: Admin | null = await adminRepo.findById(decodedRefresh.userId);
 
           if (!admin || admin.refreshToken !== refreshToken) {

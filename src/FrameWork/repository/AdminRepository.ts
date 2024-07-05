@@ -5,6 +5,8 @@ import { UserModel } from "../database/userModel";
 import IAdminRepo from "../../use_case/interface/RepositoryInterface/IAdminRepository";
 import Encrypt from "../passwordRepository/hashpassword";
 import { Types } from "mongoose";
+import { EventModel } from "../database/EventModel";
+import { IEvent } from "../../Domain/Event";
 
 class AdminRepository implements IAdminRepo {
   private encrypt: Encrypt;
@@ -67,6 +69,19 @@ class AdminRepository implements IAdminRepo {
     const admin = await AdminModel.findOne();
     return admin;
   }
+  async getEvents(type: 'photographer' | 'artist'): Promise<IEvent[]> {
+    return await EventModel.find({ type });
+  }
+
+  async deleteEvent(eventId: string): Promise<void> {
+    await EventModel.findByIdAndDelete(eventId);
+  }
+  async createEvent(event: IEvent): Promise<IEvent> {
+    const newEvent = new EventModel(event);
+    await newEvent.save();
+    return newEvent;
+  }
+  
   
 }
 

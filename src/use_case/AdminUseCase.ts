@@ -5,6 +5,7 @@ import IAdminRepo from "./interface/RepositoryInterface/IAdminRepository";
 import Encrypt from "../FrameWork/passwordRepository/hashpassword";
 import AdminJWTToken from "../FrameWork/passwordRepository/adminjwtpassword";
 import { cloudinary } from "../FrameWork/utils/CloudinaryConfig";
+import { IEvent } from "../Domain/Event";
 
 class AdminUseCase implements IAdminUseCase {
   private adminRepo: IAdminRepo;
@@ -58,6 +59,17 @@ class AdminUseCase implements IAdminUseCase {
   async getAdminDetails(): Promise<Admin | null> {
     return await this.adminRepo.getAdminDetails();
   }
+  async getEvents(type: 'photographer' | 'artist'): Promise<IEvent[]> {
+    return await this.adminRepo.getEvents(type);
+  }
+
+  async deleteEvent(eventId: string): Promise<void> {
+    return await this.adminRepo.deleteEvent(eventId);
+  }
+  async createEvent(event: IEvent): Promise<IEvent> {
+    return await this.adminRepo.createEvent(event);
+  }
+  
 }
 
 export default AdminUseCase;
