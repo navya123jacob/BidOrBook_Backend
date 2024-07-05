@@ -7,6 +7,7 @@ import adminRoute from "../routes/adminRoute"
 import { bookingController } from "../routes/injection";
 import '../../utils/updateAuctionStatus'
 
+
 const app: Express = express();
 let local=process.env.local as string
 let frontend=process.env.frontend as string
@@ -21,11 +22,11 @@ app.use(cookieParser());
 //     optionsSuccessStatus: 204
 // }));
 app.use(cors({
-    origin: 'https://bid-or-book.vercel.app',
+    origin: ['https://bid-or-book.vercel.app','http://localhost:5173'],
     credentials: true,
     
 }));
-app.use(express.static(path.join(__dirname, '../public')));
+
 
 app.use('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
     
@@ -33,9 +34,9 @@ app.use('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
 });
 
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
+app.use(express.json({ limit: '300mb' }));
+app.use(express.urlencoded({ limit: '300mb', extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, '../../../uploads')));
 
 app.use('/', userRoute);
 app.use('/admin', adminRoute);

@@ -11,11 +11,13 @@ interface PopulatedChat {
 }
 
 class MessageRepository implements IMessageRepository {
-  async sendMessage(senderId: ObjectId, receiverId: ObjectId, message: string): Promise<Message> {
+  async sendMessage(senderId: ObjectId, receiverId: ObjectId, message: string, file: string | null, fileType: string | null): Promise<Message> {
     const newMessage = new MessageModel({
       senderId,
       receiverId,
       message,
+      file,
+      fileType,
       createdAt: new Date(),
     });
     await newMessage.save();

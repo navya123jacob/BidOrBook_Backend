@@ -13,11 +13,16 @@ export class ServerSocket {
     public users: { [uid: string]: string };
     public rooms: { [roomId: string]: string[] };
     public bids: { [roomId: string]: Bid } = {};
+    public videoChunks: { [roomId: string]: { [senderId: string]: string[] } } = {};
+    public onlineUsers: Set<string>;
+    public socketIdToUserId: Map<string, string>;
 
     constructor(server: HttpServer) {
         ServerSocket.instance = this;
         this.users = {};
         this.rooms = {};
+        this.onlineUsers = new Set();
+        this.socketIdToUserId=new Map<string, string>();
         // this.io = new Server(server, {
         //     serveClient: false,
         //     pingInterval: 10000,
@@ -29,7 +34,7 @@ export class ServerSocket {
         // });
         this.io = new Server(server, {
             cors: {
-                origin: ['https://bid-or-book.vercel.app'], // Add specific allowed origins here
+                origin:['http://localhost:5173',],
                 methods: ['GET', 'POST'],
                 allowedHeaders: ['Content-Type'],
                 credentials: true
@@ -40,16 +45,44 @@ export class ServerSocket {
     }
 
     StartListeners = (socket: Socket) => {
+        
+        socket.on('user_connected', (userId) => {
+            this.onlineUsers.add(userId);
+            this.socketIdToUserId.set(socket.id, userId);
+            this.io.emit('user_online', userId);
+          
+            socket.emit('online_users', Array.from(this.onlineUsers));
+          });
+          
+          socket.on('disconnect', () => {
+            console.log('user disconnected', socket.id);
+            const userId = this.socketIdToUserId.get(socket.id);
+            if (userId) {
+              this.onlineUsers.delete(userId);
+              this.socketIdToUserId.delete(socket.id);
+              this.io.emit('user_offline', userId);
+            }
+          });
+          
+          
+          socket.on('user_logout', (userId) => {
+            if (this.onlineUsers.has(userId)) {
+              this.onlineUsers.delete(userId);
+              this.io.emit('user_offline', userId);
+            }
+          });
+          
         socket.on('handshake', ({ senderId, receiverId }, callback) => {
             console.info('Handshake received from: ' + socket.id);
-
+        
             if (typeof callback !== 'function') {
                 console.error('Callback is not a function');
                 return;
             }
-
+            
+        
             const reconnected = Object.values(this.users).includes(socket.id);
-
+        
             if (reconnected) {
                 const users = Object.values(this.users);
                 const roomId = this.GetRoomIdFromUserIds(senderId, receiverId);
@@ -59,20 +92,18 @@ export class ServerSocket {
                     return;
                 }
             }
-
+        
             const userSocketId = this.users[senderId] || socket.id;
             this.users[senderId] = userSocketId;
             const otherUserSocketId = this.users[receiverId];
             const roomId = this.CreateOrGetRoom(senderId, receiverId);
-
             socket.join(roomId);
+        
             if (otherUserSocketId) {
-                this.io.sockets.sockets.get(otherUserSocketId)?.join(roomId);
+                this.io.to(otherUserSocketId).socketsJoin(roomId);
             }
-
-            const users = Object.values(this.users);
-            callback(roomId, users);
-            this.SendMessage('user_connected', users.filter((id) => id !== socket.id), users);
+        
+            callback(roomId);
         });
 
         // Handle joining auction rooms
@@ -94,11 +125,17 @@ export class ServerSocket {
             }
         });
 
-        socket.on('chat_message', (message: { senderId: string, receiverId: string, text: string }) => {
-            console.info('Chat message received from ' + socket.id);
+        socket.on('chat_message', (message) => {
             const roomId = this.GetRoomIdFromUserIds(message.senderId, message.receiverId);
             if (roomId) {
                 this.sendMessageToRoom('chat_message', roomId, message);
+            }
+        });
+        socket.on('leaveRoom', ({ senderId, receiverId }) => {
+            const roomId = this.GetRoomIdFromUserIds(senderId, receiverId);
+            if (roomId) {
+                socket.leave(roomId);
+                console.info(`User ${senderId} left room ${roomId}`);
             }
         });
 
@@ -106,6 +143,37 @@ export class ServerSocket {
             console.info('vavao ');
             this.handlePlaceBid(socket, bid, callback);
         });
+        socket.on('video_stream', (data) => {
+            const { roomId, senderId, videoChunk } = data;
+            
+            if (!this.videoChunks[roomId]) {
+                this.videoChunks[roomId] = {};
+            }
+            
+            if (!this.videoChunks[roomId][senderId]) {
+                this.videoChunks[roomId][senderId] = [];
+            }
+            
+            this.videoChunks[roomId][senderId].push(videoChunk);
+    
+            this.sendVideoStreamToRoom('video_stream', roomId, { senderId, videoChunk });
+        });
+        socket.on('typing', ({ senderId, receiverId }) => {
+            const roomId = this.GetRoomIdFromUserIds(senderId, receiverId);
+            if (roomId) {
+              this.sendMessageToRoom('typing', roomId, { senderId });
+            }
+          });
+      
+          socket.on('stopped_typing', ({ senderId, receiverId }) => {
+            const roomId = this.GetRoomIdFromUserIds(senderId, receiverId);
+            if (roomId) {
+              this.sendMessageToRoom('stopped_typing', roomId, { senderId });
+            }
+          });
+       
+        
+        
     };
 
     CreateOrGetRoom = (uid1: string, uid2: string) => {
@@ -141,6 +209,11 @@ export class ServerSocket {
     BroadcastMessage = (name: string, payload: Object) => {
         this.io.emit(name, payload);
     };
+    sendVideoStreamToRoom = (name: string, roomId: string, payload: { senderId: string, videoChunk: string }) => {
+        this.io.to(roomId).emit(name, payload);
+    };
+    
+    
 
     handlePlaceBid = (socket: Socket, bid: { userId: string; amount: number; roomId: string }, callback: Function): void => {
         console.info(`Bid received from ${bid.userId} in room ${bid.roomId}`);

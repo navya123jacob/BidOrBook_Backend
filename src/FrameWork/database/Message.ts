@@ -1,7 +1,5 @@
-import mongoose, {  Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { MessageModelInterface } from '../../Domain/Message';
-
-
 
 const MessageSchema = new Schema<MessageModelInterface>({
     senderId: {
@@ -16,7 +14,15 @@ const MessageSchema = new Schema<MessageModelInterface>({
     },
     message: {
         type: String,
-        required: true
+        required: false
+    },
+    file: {
+        type: String,
+        required: false
+    },
+    fileType: {
+        type: String,
+        required: false
     },
     createdAt: {
         type: Date,

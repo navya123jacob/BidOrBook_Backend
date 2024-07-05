@@ -58,7 +58,7 @@ router.post('/create-checkout-session-auction', protect, (req, res) => auctionCo
 
 
 // Messaging routes
-router.post('/sendMessage', protect, (req, res) => messageController.sendMessage(req, res));
+router.post('/sendMessage', upload.single('file'),  protect, (req, res) => messageController.sendMessage(req, res));
 router.post('/getMessages', protect, (req, res) => messageController.getMessages(req, res));
 router.get('/getUserChats/:userId',protect, (req, res) => messageController.getUserChats(req, res));
 

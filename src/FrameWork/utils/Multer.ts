@@ -5,17 +5,21 @@ import path from 'path';
 const storage = multer.diskStorage({
   filename: function (req, file, cb) {
       cb(null, file.originalname);
+     
   }
 });
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback): void => {
-  if (!file.mimetype.startsWith('image')) {
-    return cb(new Error('Only images are allowed'));
+  const allowedTypes = ['image', 'video', 'audio'];
+  const fileType = file.mimetype.split('/')[0];
+  
+  if (!allowedTypes.includes(fileType)) {
+    return cb(new Error('Only images, videos, and audios are allowed'));
   }
   cb(null, true);
 };
 
-const fileSizeLimit =  20 * 1024 * 1024; // 10MB
+const fileSizeLimit =  300 * 1024 * 1024; // 300MB
 
 const upload = multer({
   storage: storage,

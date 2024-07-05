@@ -6,4 +6,6 @@ export interface MessageModelInterface extends Document{
     receiverId: ObjectId;
     message: string;
     createdAt: Date;
+    file:string;
+    fileType:string
 }
