@@ -162,16 +162,16 @@ export class ServerSocket {
         socket.on('typing', ({ senderId, receiverId }) => {
             const roomId = this.GetRoomIdFromUserIds(senderId, receiverId);
             if (roomId) {
-              this.sendMessageToRoom('typing', roomId, { senderId });
+                this.sendMessageToRoom('typing', roomId, { senderId });
             }
-          });
-      
-          socket.on('stopped_typing', ({ senderId, receiverId }) => {
+        });
+    
+        socket.on('stopped_typing', ({ senderId, receiverId }) => {
             const roomId = this.GetRoomIdFromUserIds(senderId, receiverId);
             if (roomId) {
-              this.sendMessageToRoom('stopped_typing', roomId, { senderId });
+                this.sendMessageToRoom('stopped_typing', roomId, { senderId });
             }
-          });
+        });
        
         
         

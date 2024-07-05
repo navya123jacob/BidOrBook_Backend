@@ -7,5 +7,6 @@ export interface MessageModelInterface extends Document{
     message: string;
     createdAt: Date;
     file:string;
-    fileType:string
+    fileType:string;
+    
 }

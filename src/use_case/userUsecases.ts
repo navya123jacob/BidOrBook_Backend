@@ -176,7 +176,7 @@ async login(user: User): Promise<{ status: number; data: { message: string; acce
   };
 }
 
-async saveRefreshToken(id: string | undefined, refreshToken: string | undefined): Promise<{ status: number; data: any }> {
+async saveRefreshToken(id: string | undefined, refreshToken: string | undefined): Promise<{ status: number; data: unknown }> {
   const user = await this.userRepository.updateRefreshToken(id, refreshToken);
   if (user) {
     return {
@@ -221,7 +221,7 @@ async addPostToUser(userId: string, postId: Types.ObjectId): Promise<{ status: n
   }
 }
 
-async singleUserPost(userId: string): Promise<any> {
+async singleUserPost(userId: string): Promise<unknown> {
   try {
       return await this.userRepository.singleUserPost(userId);
   } catch (error: unknown) {

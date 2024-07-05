@@ -30,8 +30,8 @@ class AdminController implements IAdminController {
         maxAge: 30 * 24 * 60 * 60 * 1000 
       });
       res.status(200).json(tokens.admin);
-    } catch (error: any) {
-      res.status(500).json({ status: false, message: error.message });
+    } catch (error: unknown) {
+      res.status(500).json({ status: false, message: (error as Error).message });
     }
   }
 
