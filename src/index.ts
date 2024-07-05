@@ -1,11 +1,12 @@
 require('dotenv').config();
+import express from 'express';
 import app from "./FrameWork/webserver/config/app";
 import connectDb from "./FrameWork/webserver/config/db";
 import { initializeSocket } from "./FrameWork/utils/Soket";
 import http from 'http';
 
-const port =  8888; 
-const server = http.createServer(app);
+const port: number = 8888; 
+const server: http.Server = http.createServer(app);
 
 const io = initializeSocket(server);
 
