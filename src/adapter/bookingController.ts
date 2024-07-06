@@ -189,9 +189,9 @@ async createCheckoutSession(req: Request, res: Response): Promise<void> {
     const { bookingId, amount, artistId, clientId } = req.body;
 
     
-    const successUrl = `https://bid-or-book.vercel.app/artprof/client?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
+    const successUrl = `https://bid-or-book.vercel.app/profile`;
     
-    const cancelUrl = `https://bid-or-book.vercel.app/artprof/client?id=${artistId}&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `https://bid-or-book.vercel.app/profile`;
 
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
