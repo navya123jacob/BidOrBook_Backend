@@ -180,14 +180,14 @@ class UserController implements IUserController {
         res.cookie('userJWT', user.data.accessToken, {
           httpOnly: true,
           sameSite: 'none',
-          secure: secureFlag, 
+          secure: true, 
           maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
         res.cookie('refreshToken', user.data.refreshToken, {
           httpOnly: true,
           sameSite: 'none',
-          secure: secureFlag,
+          secure: true,
           maxAge: 30 * 24 * 60 * 60 * 1000 
         });
         const { accessToken, refreshToken, ...userData } = user.data;

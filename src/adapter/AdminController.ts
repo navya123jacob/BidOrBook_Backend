@@ -20,13 +20,13 @@ class AdminController implements IAdminController {
       res.cookie('adminJWT', tokens.accessToken, {
         httpOnly: true,
         sameSite: 'none',
-        secure: process.env.NODE_ENV !== 'development',
+        secure: true,
         maxAge: 30 * 24 * 60 * 60 * 1000 
       });
       res.cookie('adminRefreshToken', tokens.refreshToken, {
         httpOnly: true,
         sameSite: 'none',
-        secure: process.env.NODE_ENV !== 'development',
+        secure: true,
         maxAge: 30 * 24 * 60 * 60 * 1000 
       });
       res.status(200).json(tokens.admin);

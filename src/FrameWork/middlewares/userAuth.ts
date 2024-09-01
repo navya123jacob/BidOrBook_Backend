@@ -19,6 +19,7 @@ declare global {
 
 export const protect = async (req: Request, res: Response, next: NextFunction) => {
     try {
+       
         const accessToken = req.cookies.userJWT;
         
         if (!accessToken) {
@@ -28,6 +29,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
         let decoded: JwtPayload;
         try {
             decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET as string) as JwtPayload
+            
             req.userId = decoded.userId;
 
             const user: User | null = await userRepo.findById(decoded.userId);
